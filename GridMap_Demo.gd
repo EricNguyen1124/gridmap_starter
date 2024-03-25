@@ -7,7 +7,7 @@ const DEBUG_RENDER_EDGES = true
 var levelSizeZ = 30
 var levelSizeX = 30
 var numberOfRooms = 6
-var percentPaths = 0.6
+var percentPaths = 0.3
 
 var roomArray = []
 
@@ -54,62 +54,46 @@ func generateLevel():
 			if !delaunay.is_border_triangle(triangle): 
 				show_triangle(triangle)
 	
-	var edges = []
 	for triangle in triangles:
-		if !edgeExists(edges, triangle.edge_ab):
-			var rooms = assignEdgeToRooms(triangle.edge_ab)
-			edges.append(rooms)
+		assignEdgeToRooms(triangle.edge_ab)
+		assignEdgeToRooms(triangle.edge_bc)
+		assignEdgeToRooms(triangle.edge_ca)
 		
-		if !edgeExists(edges, triangle.edge_bc):
-			var rooms = assignEdgeToRooms(triangle.edge_bc)
-			edges.append(rooms)
-		
-		if !edgeExists(edges, triangle.edge_ca):
-			var rooms = assignEdgeToRooms(triangle.edge_ca)
-			edges.append(rooms)
-	
-	for edge in edges:
-		for room in edge:
+	for room in roomArray:
+		print(room)
+		for edge in room.edges:
+			if randf() > percentPaths && edge.active:
+				edge.active = false
+				var toRoom = findRoomWithId(edge.roomId)
+				toRoom.setEdgeActive(edge.roomId, false)
+				pass
 			pass
 	
-	var chosenEdges = []
-	
-	for i in range(edges.size() * percentPaths):
-		var randomEdge = edges.pick_random()
-		edges.erase(randomEdge)
-		# MAKE SURE IT IS NOT REMOVING THE LAST EDGE FOR THAT ROOM!
-		chosenEdges.append(randomEdge)
-	
 	if DEBUG_RENDER_EDGES:
-		show_edges(chosenEdges)
+		show_edges()
 	
 	var roomEdges = []
-	
-	for edge in chosenEdges:
-		var fromRoom = findRoom(edge.a)
-		var toRoom = findRoom(edge.b)
-		roomEdges.append({"from": fromRoom, "to": toRoom})
-		# MORE STRAIGHT PATHS, MORE RANDOMIZATION
-		#for i in range(10000):
-			#var idk = edge.a.lerp(edge.b, i * 0.0001)
-			#set_cell_item(Vector3(idk.x, 0, idk.y), 0)
 
 func assignEdgeToRooms(edge):
-	var fromRoom = findRoom(edge.a)
-	var toRoom = findRoom(edge.b)
-	fromRoom.edges.append(toRoom.id)
-	toRoom.edges.append(fromRoom.id)
-	return [fromRoom, toRoom]
+	var fromRoom = findRoomWithVector(edge.a)
+	var toRoom = findRoomWithVector(edge.b)
+	
+	if !fromRoom.edges.any(func(edge): return edge.roomId == toRoom.id):
+		var e = Edge.new(toRoom.id)
+		fromRoom.edges.append(e)
+	
+	if !toRoom.edges.any(func(edge): return edge.roomId == fromRoom.id):
+		var e = Edge.new(fromRoom.id)
+		toRoom.edges.append(e)
 
-func edgeExists(edges, edge):
-	for e in edges:
-		if e.equals(edge):
-			return true
-	return false
-
-func findRoom(point):
+func findRoomWithVector(point):
 	for room in roomArray:
 		if room.isPointInside(point):
+			return room
+
+func findRoomWithId(id):
+	for room in roomArray:
+		if room.id == id:
 			return room
 
 func show_triangle(triangle: Delaunay.Triangle):
@@ -131,14 +115,23 @@ func show_triangle(triangle: Delaunay.Triangle):
 		Color(1, 1, 0),
 		100)
 
-func show_edges(edges):
+func show_edges():
 	DebugDraw3D.clear_all()
-	for edge in edges:
-		DebugDraw3D.draw_line(
-			Vector3(edge.a.x*2,0,edge.a.y*2), 
-			Vector3(edge.b.x*2,0,edge.b.y*2),
-			Color(1, 1, 0),
-			100)
+	for room in roomArray:
+		for edge in room.edges:
+			if edge.active:
+				var toRoom = findRoomWithId(edge.roomId)
+				DebugDraw3D.draw_line(
+					Vector3(room.pos.x*2,0,room.pos.y*2), 
+					Vector3(toRoom.pos.x*2,0,toRoom.pos.y*2),
+					Color(1, 1, 0),
+					100)
+	#for edge in edges:
+		#DebugDraw3D.draw_line(
+			#Vector3(edge.a.x*2,0,edge.a.y*2), 
+			#Vector3(edge.b.x*2,0,edge.b.y*2),
+			#Color(1, 1, 0),
+			#100)
 
 func drawRooms():
 	var roomNum = 0
@@ -169,7 +162,7 @@ class Room:
 	var worldPos
 	var width
 	var height
-	var edges
+	var edges = []
 	
 	var minRoomSizeX = 3
 	var maxRoomSizeX = 5
@@ -205,3 +198,23 @@ class Room:
 		if point.x < pos.x || point.x > pos.x + width || point.y < pos.y || point.y > pos.y + height:
 			return false
 		return true
+		
+	func setEdgeActive(roomId, active):
+		for edge in edges:
+			if edge.roomId == roomId:
+				edge.active = active
+				return
+		print("COULDN'T FIND EDGE " + str(roomId))
+	
+	func _to_string():
+		var coords = "(%s,%s) " % [pos.x, pos.y]
+		var id = "%s connects to " % [id]
+		var edgeIds = ", ".join(edges.map(func(e): return e.roomId))	
+		return coords + id + edgeIds
+
+class Edge:
+	var active = true
+	var roomId
+	
+	func _init(id):
+		roomId = id
