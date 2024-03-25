@@ -2,7 +2,7 @@ extends GridMap
 
 const DEBUG_PRINT_ROOMS = false
 const DEBUG_RENDER_TRIANGLES = false
-const DEBUG_RENDER_EDGES = false
+const DEBUG_RENDER_EDGES = true
 
 var levelSizeZ = 30
 var levelSizeX = 30
@@ -39,7 +39,7 @@ func generateLevel():
 		roomArray.append(potentialRoom)
 		pointsList.append(potentialRoom.worldPos)
 		roomsPlaced += 1
-		
+	
 	drawRooms()
 	
 	# fuck this!!!
@@ -57,14 +57,20 @@ func generateLevel():
 	var edges = []
 	for triangle in triangles:
 		if !edgeExists(edges, triangle.edge_ab):
-			edges.append(triangle.edge_ab)
+			var rooms = assignEdgeToRooms(triangle.edge_ab)
+			edges.append(rooms)
 		
 		if !edgeExists(edges, triangle.edge_bc):
-			edges.append(triangle.edge_bc)
+			var rooms = assignEdgeToRooms(triangle.edge_bc)
+			edges.append(rooms)
 		
 		if !edgeExists(edges, triangle.edge_ca):
-			edges.append(triangle.edge_ca)
-	print(edges)
+			var rooms = assignEdgeToRooms(triangle.edge_ca)
+			edges.append(rooms)
+	
+	for edge in edges:
+		for room in edge:
+			pass
 	
 	var chosenEdges = []
 	
@@ -77,18 +83,34 @@ func generateLevel():
 	if DEBUG_RENDER_EDGES:
 		show_edges(chosenEdges)
 	
+	var roomEdges = []
+	
 	for edge in chosenEdges:
+		var fromRoom = findRoom(edge.a)
+		var toRoom = findRoom(edge.b)
+		roomEdges.append({"from": fromRoom, "to": toRoom})
 		# MORE STRAIGHT PATHS, MORE RANDOMIZATION
-		for i in range(100):
-			var idk = edge.a.lerp(edge.b, i * 0.01)
-			set_cell_item(Vector3(idk.x, 0, idk.y), 0)
+		#for i in range(10000):
+			#var idk = edge.a.lerp(edge.b, i * 0.0001)
+			#set_cell_item(Vector3(idk.x, 0, idk.y), 0)
 
+func assignEdgeToRooms(edge):
+	var fromRoom = findRoom(edge.a)
+	var toRoom = findRoom(edge.b)
+	fromRoom.edges.append(toRoom.id)
+	toRoom.edges.append(fromRoom.id)
+	return [fromRoom, toRoom]
 
 func edgeExists(edges, edge):
 	for e in edges:
 		if e.equals(edge):
 			return true
 	return false
+
+func findRoom(point):
+	for room in roomArray:
+		if room.isPointInside(point):
+			return room
 
 func show_triangle(triangle: Delaunay.Triangle):
 	DebugDraw3D.draw_line(
@@ -147,6 +169,7 @@ class Room:
 	var worldPos
 	var width
 	var height
+	var edges
 	
 	var minRoomSizeX = 3
 	var maxRoomSizeX = 5
@@ -176,4 +199,9 @@ class Room:
 		if right < left2 || left > right2 || up > down2 || down < up2:
 			return false
 		
+		return true
+	
+	func isPointInside(point):
+		if point.x < pos.x || point.x > pos.x + width || point.y < pos.y || point.y > pos.y + height:
+			return false
 		return true
