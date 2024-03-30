@@ -4,10 +4,10 @@ const DEBUG_PRINT_ROOMS = false
 const DEBUG_RENDER_TRIANGLES = false
 const DEBUG_RENDER_EDGES = true
 
-var levelSizeZ = 30
+var levelSizeZ = 20
 var levelSizeX = 30
 var numberOfRooms = 6
-var percentPaths = 0.3
+var percentPaths = 0.2
 
 var roomArray = []
 
@@ -43,7 +43,7 @@ func generateLevel():
 	drawRooms()
 	
 	# fuck this!!!
-	var delaunay = Delaunay.new(Rect2(0,0,50,50))
+	var delaunay = Delaunay.new()
 	for points in pointsList:
 		delaunay.add_point(points)
 	var triangles = delaunay.triangulate()
@@ -58,21 +58,27 @@ func generateLevel():
 		assignEdgeToRooms(triangle.edge_ab)
 		assignEdgeToRooms(triangle.edge_bc)
 		assignEdgeToRooms(triangle.edge_ca)
-		
+	
+	var visited = []
+	dfs(visited, findRoomWithId(0), _dfs_randomlyDeactivateEdge)
+	
 	for room in roomArray:
 		print(room)
-		for edge in room.edges:
-			if randf() > percentPaths && edge.active:
-				edge.active = false
-				var toRoom = findRoomWithId(edge.roomId)
-				toRoom.setEdgeActive(edge.roomId, false)
-				pass
-			pass
 	
 	if DEBUG_RENDER_EDGES:
 		show_edges()
 	
-	var roomEdges = []
+	
+func dfs(visited, room, function: Callable):
+	if !visited.has(room):
+		visited.append(room)
+		for edge in room.edges:
+			function.call(room, edge)
+			dfs(visited, findRoomWithId(edge.roomId), function)
+
+func _dfs_randomlyDeactivateEdge(room, edge):
+	if randf() > percentPaths && room.edges.filter(func(e): return e.active == true).size() > 1:
+				edge.active = false
 
 func assignEdgeToRooms(edge):
 	var fromRoom = findRoomWithVector(edge.a)
@@ -90,6 +96,10 @@ func findRoomWithVector(point):
 	for room in roomArray:
 		if room.isPointInside(point):
 			return room
+			
+func findRoomPosWithId(id):
+	var room = findRoomWithId(id)
+	return room.worldPos
 
 func findRoomWithId(id):
 	for room in roomArray:
@@ -122,8 +132,8 @@ func show_edges():
 			if edge.active:
 				var toRoom = findRoomWithId(edge.roomId)
 				DebugDraw3D.draw_line(
-					Vector3(room.pos.x*2,0,room.pos.y*2), 
-					Vector3(toRoom.pos.x*2,0,toRoom.pos.y*2),
+					Vector3(room.worldPos.x*2,0,room.worldPos.y*2), 
+					Vector3(toRoom.worldPos.x*2,0,toRoom.worldPos.y*2),
 					Color(1, 1, 0),
 					100)
 	#for edge in edges:
@@ -176,7 +186,7 @@ class Room:
 		height = randi_range(minRoomSizeZ, maxRoomSizeZ)
 		var iW = float(width-1) / 2
 		var iH = float(height-1) / 2
-		worldPos = Vector2(pos.x + iW, pos.y + iH)
+		worldPos = Vector2(pos.x + iW + 0.5, pos.y + iH + 0.5)
 
 	func checkRoomCollide(room):
 		var left = pos.x
@@ -189,7 +199,7 @@ class Room:
 		var up2 = room.pos.y
 		var down2 = room.pos.y + room.height
 		
-		if right < left2 || left > right2 || up > down2 || down < up2:
+		if right + 2 < left2 || left - 2 > right2 || up - 2 > down2 || down + 2 < up2:
 			return false
 		
 		return true
@@ -209,7 +219,7 @@ class Room:
 	func _to_string():
 		var coords = "(%s,%s) " % [pos.x, pos.y]
 		var id = "%s connects to " % [id]
-		var edgeIds = ", ".join(edges.map(func(e): return e.roomId))	
+		var edgeIds = ", ".join(edges.filter(func(e): return e.active == true).map(func(e): return e.roomId))	
 		return coords + id + edgeIds
 
 class Edge:
