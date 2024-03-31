@@ -4,15 +4,21 @@ const DEBUG_PRINT_ROOMS = false
 const DEBUG_RENDER_TRIANGLES = false
 const DEBUG_RENDER_EDGES = true
 
-var levelSizeZ = 20
-var levelSizeX = 30
+var levelSizeZ = 30
+var levelSizeX = 40
 var numberOfRooms = 6
-var percentPaths = 0.2
+var percentPaths = 0.6
 
 var roomArray = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	var label3d = Label3D.new()
+	add_child(label3d)
+	label3d.set_rotation_degrees(Vector3(-90,0,0))
+	label3d.set_scale(Vector3(10,10,10))
+	label3d.set_text("HHHASDFIAHSDFLAKSDJF")
+	label3d.set_position(Vector3(3, 2, 3))
 	generateLevel()
 	set_cell_item(Vector3(0,0,0), 7)
 	set_cell_item(Vector3(levelSizeX,0,levelSizeZ), 7)
@@ -59,22 +65,53 @@ func generateLevel():
 		assignEdgeToRooms(triangle.edge_bc)
 		assignEdgeToRooms(triangle.edge_ca)
 	
+	var labelChildren = get_children()#.filter(func(n): n is Label3D)
+	for label in labelChildren:
+		if label is Label3D:
+			label.queue_free()
+			
+
+		
 	var visited = []
-	dfs(visited, findRoomWithId(0), _dfs_randomlyDeactivateEdge)
+
+	dfs(visited, findRoomWithId(0))
+	print(visited.size())
+	visited = []
+	dfsActive(visited, findRoomWithId(0))
+	print(visited.size())
 	
 	for room in roomArray:
+		var label3d = Label3D.new()
+		add_child(label3d)
+		label3d.set_rotation_degrees(Vector3(-90,0,0))
+		label3d.set_scale(Vector3(10,10,10))
+		label3d.set_text(room.to_string())
+		label3d.set_position(Vector3(room.pos.x*2, 2, room.pos.y*2))
 		print(room)
 	
 	if DEBUG_RENDER_EDGES:
 		show_edges()
 	
-	
-func dfs(visited, room, function: Callable):
+
+func dfs(visited, room):
 	if !visited.has(room):
 		visited.append(room)
 		for edge in room.edges:
-			function.call(room, edge)
-			dfs(visited, findRoomWithId(edge.roomId), function)
+			var toRoom = findRoomWithId(edge.roomId)
+			
+			if randf() > percentPaths && room.edges.filter(func(e): return e.active).size() > 1 && toRoom.edges.filter(func(e): return e.active).size() > 1:
+				edge.active = false
+				toRoom.setEdgeActive(room.id, false)
+			
+			dfs(visited, findRoomWithId(edge.roomId))
+
+func dfsActive(visited, room):
+	if !visited.has(room):
+		visited.append(room)
+		var edges = room.edges.filter(func(e): return e.active == true)
+		print(str(room.id) + " has " + str(edges.size()))
+		for edge in edges:
+			dfs(visited, findRoomWithId(edge.roomId))
 
 func _dfs_randomlyDeactivateEdge(room, edge):
 	if randf() > percentPaths && room.edges.filter(func(e): return e.active == true).size() > 1:
@@ -131,11 +168,10 @@ func show_edges():
 		for edge in room.edges:
 			if edge.active:
 				var toRoom = findRoomWithId(edge.roomId)
-				DebugDraw3D.draw_line(
+				DebugDraw3D.draw_arrow(
 					Vector3(room.worldPos.x*2,0,room.worldPos.y*2), 
 					Vector3(toRoom.worldPos.x*2,0,toRoom.worldPos.y*2),
-					Color(1, 1, 0),
-					100)
+					Color(1, 1, 0), 0.02, false, 100)
 	#for edge in edges:
 		#DebugDraw3D.draw_line(
 			#Vector3(edge.a.x*2,0,edge.a.y*2), 
@@ -218,9 +254,9 @@ class Room:
 	
 	func _to_string():
 		var coords = "(%s,%s) " % [pos.x, pos.y]
-		var id = "%s connects to " % [id]
+		var id = "%s to " % [id]
 		var edgeIds = ", ".join(edges.filter(func(e): return e.active == true).map(func(e): return e.roomId))	
-		return coords + id + edgeIds
+		return id + edgeIds
 
 class Edge:
 	var active = true
