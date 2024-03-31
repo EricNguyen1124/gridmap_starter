@@ -1,13 +1,13 @@
 extends GridMap
 
 const DEBUG_PRINT_ROOMS = false
-const DEBUG_RENDER_TRIANGLES = false
+const DEBUG_RENDER_TRIANGLES = true
 const DEBUG_RENDER_EDGES = true
 
 var levelSizeZ = 30
 var levelSizeX = 40
 var numberOfRooms = 6
-var percentPaths = 0.6
+var percentPaths = 0.5
 
 var roomArray = []
 
@@ -73,12 +73,16 @@ func generateLevel():
 
 		
 	var visited = []
-
-	dfs(visited, findRoomWithId(0))
-	print(visited.size())
-	visited = []
-	dfsActive(visited, findRoomWithId(0))
-	print(visited.size())
+	
+	while visited.size() != roomArray.size():
+		print("DRAWING PATHS")
+		for room in roomArray:
+			for edge in room.edges:
+				edge.active = true	
+		visited = []
+		dfs(visited, findRoomWithId(0))
+		visited = []
+		dfsActive(visited, findRoomWithId(0))
 	
 	for room in roomArray:
 		var label3d = Label3D.new()
@@ -87,7 +91,6 @@ func generateLevel():
 		label3d.set_scale(Vector3(10,10,10))
 		label3d.set_text(room.to_string())
 		label3d.set_position(Vector3(room.pos.x*2, 2, room.pos.y*2))
-		print(room)
 	
 	if DEBUG_RENDER_EDGES:
 		show_edges()
@@ -95,11 +98,12 @@ func generateLevel():
 
 func dfs(visited, room):
 	if !visited.has(room):
+		print("visiting" + room.to_string())
 		visited.append(room)
 		for edge in room.edges:
 			var toRoom = findRoomWithId(edge.roomId)
 			
-			if randf() > percentPaths && room.edges.filter(func(e): return e.active).size() > 1 && toRoom.edges.filter(func(e): return e.active).size() > 1:
+			if randf() > percentPaths && room.edges.filter(func(e): return e.active).size() > 1: #&& toRoom.edges.filter(func(e): return e.active).size() > 1:
 				edge.active = false
 				toRoom.setEdgeActive(room.id, false)
 			
@@ -109,9 +113,8 @@ func dfsActive(visited, room):
 	if !visited.has(room):
 		visited.append(room)
 		var edges = room.edges.filter(func(e): return e.active == true)
-		print(str(room.id) + " has " + str(edges.size()))
 		for edge in edges:
-			dfs(visited, findRoomWithId(edge.roomId))
+			dfsActive(visited, findRoomWithId(edge.roomId))
 
 func _dfs_randomlyDeactivateEdge(room, edge):
 	if randf() > percentPaths && room.edges.filter(func(e): return e.active == true).size() > 1:
