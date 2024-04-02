@@ -1,7 +1,7 @@
 extends GridMap
 
 const DEBUG_PRINT_ROOMS = false
-const DEBUG_RENDER_TRIANGLES = true
+const DEBUG_RENDER_TRIANGLES = false
 const DEBUG_RENDER_EDGES = true
 
 var levelSizeZ = 30
@@ -13,12 +13,6 @@ var roomArray = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var label3d = Label3D.new()
-	add_child(label3d)
-	label3d.set_rotation_degrees(Vector3(-90,0,0))
-	label3d.set_scale(Vector3(10,10,10))
-	label3d.set_text("HHHASDFIAHSDFLAKSDJF")
-	label3d.set_position(Vector3(3, 2, 3))
 	generateLevel()
 	set_cell_item(Vector3(0,0,0), 7)
 	set_cell_item(Vector3(levelSizeX,0,levelSizeZ), 7)
@@ -69,20 +63,21 @@ func generateLevel():
 	for label in labelChildren:
 		if label is Label3D:
 			label.queue_free()
-			
-
-		
+	
+	var attempts = 0
 	var visited = []
 	
 	while visited.size() != roomArray.size():
-		print("DRAWING PATHS")
+		if attempts > 100:
+			return false
 		for room in roomArray:
 			for edge in room.edges:
-				edge.active = true	
+				edge.active = true
 		visited = []
 		dfs(visited, findRoomWithId(0))
 		visited = []
 		dfsActive(visited, findRoomWithId(0))
+		attempts += 1
 	
 	for room in roomArray:
 		var label3d = Label3D.new()
@@ -91,14 +86,18 @@ func generateLevel():
 		label3d.set_scale(Vector3(10,10,10))
 		label3d.set_text(room.to_string())
 		label3d.set_position(Vector3(room.pos.x*2, 2, room.pos.y*2))
-	
+	randomPath(1,2,3)
 	if DEBUG_RENDER_EDGES:
 		show_edges()
-	
+
+enum CellState {OPEN, FORCED, BLOCKED}
+func randomPath(from, to, wiggliness = 1):
+	for x in range(levelSizeX):
+		for y in range(levelSizeZ):
+			set_cell_item(Vector3(x,1,y), CellState.OPEN)
 
 func dfs(visited, room):
 	if !visited.has(room):
-		print("visiting" + room.to_string())
 		visited.append(room)
 		for edge in room.edges:
 			var toRoom = findRoomWithId(edge.roomId)
