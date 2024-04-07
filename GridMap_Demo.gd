@@ -59,7 +59,7 @@ func generateLevel():
 		assignEdgeToRooms(triangle.edge_bc)
 		assignEdgeToRooms(triangle.edge_ca)
 	
-	var labelChildren = get_children()#.filter(func(n): n is Label3D)
+	var labelChildren = get_children()
 	for label in labelChildren:
 		if label is Label3D:
 			label.queue_free()
@@ -80,21 +80,57 @@ func generateLevel():
 		attempts += 1
 	
 	for room in roomArray:
-		var label3d = Label3D.new()
-		add_child(label3d)
-		label3d.set_rotation_degrees(Vector3(-90,0,0))
-		label3d.set_scale(Vector3(10,10,10))
-		label3d.set_text(room.to_string())
-		label3d.set_position(Vector3(room.pos.x*2, 2, room.pos.y*2))
-	randomPath(1,2,3)
+		drawText(room.to_string(), room.pos * 2)
+		
+	randomPath(roomArray[0], roomArray[1])
 	if DEBUG_RENDER_EDGES:
 		show_edges()
 
 enum CellState {OPEN, FORCED, BLOCKED}
-func randomPath(from, to, wiggliness = 1):
+
+func randomPath(fromRoom, toRoom, wiggliness = 1):
+	var fromPos = fromRoom.worldPos
+	var toPos = toRoom.worldPos
+	
 	for x in range(levelSizeX):
 		for y in range(levelSizeZ):
 			set_cell_item(Vector3(x,1,y), CellState.OPEN)
+	
+	set_cell_item(Vector3(toPos.x,1,toPos.y), CellState.FORCED)	
+	set_cell_item(Vector3(fromPos.x,1,fromPos.y), CellState.FORCED)
+	
+	var witness = astar(fromRoom, toRoom)
+	
+	while !anyRemainingOpenCells():
+		var openPathCells = Array(witness).map(func(p): return Vector3(p.x, 1, p.y)).filter(func(c): return get_cell_item(c) == CellState.OPEN);
+		var pathWeight = openPathCells.size() * wiggliness
+		var nonPathWeight = 3
+		break
+		pass
+		
+	return witness
+
+func astar(from, to):
+	var astar = AStarGrid2D.new()
+	astar.region = Rect2i(0,0,levelSizeX+5, levelSizeZ+5)
+	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
+	astar.update()
+	
+	for x in range(levelSizeX+5):
+		for y in range(levelSizeZ+5):
+			var room = findRoomWithVector(Vector2(x,y))
+			if room != null && room.id != from.id && room.id != to.id:
+				astar.set_point_solid(Vector2i(x,y), true)
+	
+	return astar.get_point_path(from.worldPos, to.worldPos)
+
+func anyRemainingOpenCells():
+	for x in range(levelSizeX):
+		for y in range(levelSizeZ):
+			if get_cell_item(Vector3(x,1,y)) == CellState.OPEN:
+				return false
+	
+	return true
 
 func dfs(visited, room):
 	if !visited.has(room):
@@ -197,7 +233,15 @@ func drawRooms():
 			print(room.worldPos)
 			print("")
 		roomNum += 1
-
+	
+func drawText(text, pos):
+		var label3d = Label3D.new()
+		add_child(label3d)
+		label3d.set_rotation_degrees(Vector3(-90,0,0))
+		label3d.set_scale(Vector3(10,10,10))
+		label3d.set_text(text)
+		label3d.set_position(Vector3(pos.x, 2, pos.y))
+		
 func potentialRoomCollides(potentialRoom):
 	for room in roomArray:
 			if potentialRoom.checkRoomCollide(room):
