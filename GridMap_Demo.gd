@@ -79,10 +79,16 @@ func generateLevel():
 		dfsActive(visited, findRoomWithId(0))
 		attempts += 1
 	
+	var drawnEdge = []
 	for room in roomArray:
 		drawText(room.to_string(), room.pos * 2)
-		
-	randomPath(roomArray[0], roomArray[1])
+		for edge in room.edges.filter(func(e): return e.active == true):
+			if !drawnEdge.has(Vector2(room.id, edge.roomId)) && !drawnEdge.has(Vector2(edge.roomId, room.id)):
+				var som = randomPath(room, findRoomWithId(edge.roomId), 0.5)
+				for coord in som:
+					set_cell_item(Vector3(coord.x,0,coord.y), 0)
+				drawnEdge.append(Vector2(room.id, edge.roomId))
+
 	if DEBUG_RENDER_EDGES:
 		show_edges()
 
@@ -92,45 +98,54 @@ func randomPath(fromRoom, toRoom, wiggliness = 1):
 	var fromPos = fromRoom.worldPos
 	var toPos = toRoom.worldPos
 	
-	for x in range(levelSizeX):
-		for y in range(levelSizeZ):
-			set_cell_item(Vector3(x,1,y), CellState.OPEN)
+	var cellStates = {}
+	for x in range(levelSizeX + 5):
+		for y in range(levelSizeZ + 5):
+			cellStates[Vector2(x,y)] = CellState.OPEN
 	
-	set_cell_item(Vector3(toPos.x,1,toPos.y), CellState.FORCED)	
-	set_cell_item(Vector3(fromPos.x,1,fromPos.y), CellState.FORCED)
+	cellStates[fromPos] = CellState.FORCED
+	cellStates[toPos] = CellState.FORCED
 	
-	var witness = astar(fromRoom, toRoom)
-	
-	while !anyRemainingOpenCells():
-		var openPathCells = Array(witness).map(func(p): return Vector3(p.x, 1, p.y)).filter(func(c): return get_cell_item(c) == CellState.OPEN);
-		var pathWeight = openPathCells.size() * wiggliness
-		var nonPathWeight = 3
-		break
-		pass
-		
-	return witness
-
-func astar(from, to):
 	var astar = AStarGrid2D.new()
 	astar.region = Rect2i(0,0,levelSizeX+5, levelSizeZ+5)
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
 	astar.update()
+	var witness = astar(astar, fromRoom, toRoom, cellStates)
+	
+	while cellStates.values().any(func(c): return c == CellState.OPEN):
+		var openPathCells = Array(witness).filter(func(c): return cellStates[c] == CellState.OPEN)
+		var openCells = cellStates.keys().filter(func(c): return cellStates[c] == CellState.OPEN)
+		var nonPathOpenCells = openCells.filter(func(c): return !witness.has(c))
+		
+		var pathWeight = openPathCells.size() * wiggliness
+		var nonPathWeight = openCells.size() - openPathCells.size()
+		var totalWeight = pathWeight + nonPathWeight
+		
+		var randomCell
+		if (randf() * totalWeight) < pathWeight:
+			randomCell = openPathCells.pick_random()
+		else:
+			randomCell = nonPathOpenCells.pick_random()
+
+		cellStates[randomCell] = CellState.BLOCKED
+		
+		if witness.has(randomCell):
+			var newPath = astar(astar, fromRoom, toRoom, cellStates)
+			if newPath.is_empty():
+				cellStates[randomCell] = CellState.FORCED
+			else:
+				witness = newPath
+	return witness
+
+func astar(astar, from, to, cellStates):
 	
 	for x in range(levelSizeX+5):
 		for y in range(levelSizeZ+5):
 			var room = findRoomWithVector(Vector2(x,y))
-			if room != null && room.id != from.id && room.id != to.id:
+			if (room != null && room.id != from.id && room.id != to.id) || cellStates[Vector2(x,y)] == CellState.BLOCKED:
 				astar.set_point_solid(Vector2i(x,y), true)
 	
 	return astar.get_point_path(from.worldPos, to.worldPos)
-
-func anyRemainingOpenCells():
-	for x in range(levelSizeX):
-		for y in range(levelSizeZ):
-			if get_cell_item(Vector3(x,1,y)) == CellState.OPEN:
-				return false
-	
-	return true
 
 func dfs(visited, room):
 	if !visited.has(room):
