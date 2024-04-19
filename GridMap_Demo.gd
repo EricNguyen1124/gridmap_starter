@@ -11,9 +11,10 @@ var percentPaths = 0.5
 
 var roomArray = []
 
+var pathTasks = {}
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	generateLevel()
+	#generateLevel()
 	set_cell_item(Vector3(0,0,0), 7)
 	set_cell_item(Vector3(levelSizeX,0,levelSizeZ), 7)
 
@@ -84,25 +85,41 @@ func generateLevel():
 		drawText(room.to_string(), room.pos * 2)
 		for edge in room.edges.filter(func(e): return e.active == true):
 			if !drawnEdge.has(Vector2(room.id, edge.roomId)) && !drawnEdge.has(Vector2(edge.roomId, room.id)):
-				var som = randomPath(room, findRoomWithId(edge.roomId), 0.5)
+				pathTasks[[room.id, edge.roomId]] = []
+				var som = randomPath(room, findRoomWithId(edge.roomId), 2)
 				for coord in som:
 					set_cell_item(Vector3(coord.x,0,coord.y), 0)
 				drawnEdge.append(Vector2(room.id, edge.roomId))
-
+				
+	var task_id = WorkerThreadPool.add_group_task(mtRandomPath, pathTasks.size())
+	WorkerThreadPool.wait_for_group_task_completion(task_id)
+	for result in pathTasks.values():
+		for coord in result:
+			set_cell_item(Vector3(coord.x,0,coord.y), 0)
 	if DEBUG_RENDER_EDGES:
 		show_edges()
 
 enum CellState {OPEN, FORCED, BLOCKED}
-
+	
+func mtRandomPath(taskIndex):
+	print(pathTasks.keys()[taskIndex])
+	var fromRoom = findRoomWithId(pathTasks.keys()[taskIndex][0])
+	var toRoom = findRoomWithId(pathTasks.keys()[taskIndex][1])
+	pathTasks[pathTasks.keys()[taskIndex]] = randomPath(fromRoom, toRoom, 2)
+	
 func randomPath(fromRoom, toRoom, wiggliness = 1):
 	var fromPos = fromRoom.worldPos
 	var toPos = toRoom.worldPos
 	
+	var openCells = []
 	var cellStates = {}
 	for x in range(levelSizeX + 5):
 		for y in range(levelSizeZ + 5):
+			openCells.push_back(Vector2(x,y))
 			cellStates[Vector2(x,y)] = CellState.OPEN
-	
+
+	openCells.erase(fromPos)
+	openCells.erase(toPos)
 	cellStates[fromPos] = CellState.FORCED
 	cellStates[toPos] = CellState.FORCED
 	
@@ -110,24 +127,25 @@ func randomPath(fromRoom, toRoom, wiggliness = 1):
 	astar.region = Rect2i(0,0,levelSizeX+5, levelSizeZ+5)
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
 	astar.update()
-	var witness = astar(astar, fromRoom, toRoom, cellStates)
 	
-	while cellStates.values().any(func(c): return c == CellState.OPEN):
-		var openPathCells = Array(witness).filter(func(c): return cellStates[c] == CellState.OPEN)
-		var openCells = cellStates.keys().filter(func(c): return cellStates[c] == CellState.OPEN)
-		var nonPathOpenCells = openCells.filter(func(c): return !witness.has(c))
+	var witness = astar(astar, fromRoom, toRoom, cellStates)
+
+	while openCells.size() != 0:
+		var openPathCells = witness.filter(func(c): return cellStates[c] == CellState.OPEN)
 		
 		var pathWeight = openPathCells.size() * wiggliness
 		var nonPathWeight = openCells.size() - openPathCells.size()
 		var totalWeight = pathWeight + nonPathWeight
-		
+		#var start = Time.get_ticks_usec()
 		var randomCell
-		if (randf() * totalWeight) < pathWeight:
+		if (randf() * totalWeight) <= pathWeight:
 			randomCell = openPathCells.pick_random()
 		else:
+			var nonPathOpenCells = openCells.filter(func(c): return !witness.has(c))
 			randomCell = nonPathOpenCells.pick_random()
-
+		
 		cellStates[randomCell] = CellState.BLOCKED
+		openCells.erase(randomCell)
 		
 		if witness.has(randomCell):
 			var newPath = astar(astar, fromRoom, toRoom, cellStates)
@@ -135,17 +153,19 @@ func randomPath(fromRoom, toRoom, wiggliness = 1):
 				cellStates[randomCell] = CellState.FORCED
 			else:
 				witness = newPath
+		#var end = Time.get_ticks_usec()
+		#var worker_time = (end-start)
+		#print("Worker time: %s" % [worker_time])
 	return witness
 
 func astar(astar, from, to, cellStates):
-	
 	for x in range(levelSizeX+5):
 		for y in range(levelSizeZ+5):
 			var room = findRoomWithVector(Vector2(x,y))
 			if (room != null && room.id != from.id && room.id != to.id) || cellStates[Vector2(x,y)] == CellState.BLOCKED:
 				astar.set_point_solid(Vector2i(x,y), true)
-	
-	return astar.get_point_path(from.worldPos, to.worldPos)
+	var point_paths = astar.get_point_path(from.worldPos, to.worldPos)
+	return Array(point_paths)
 
 func dfs(visited, room):
 	if !visited.has(room):
@@ -272,10 +292,10 @@ class Room:
 	var edges = []
 	
 	var minRoomSizeX = 3
-	var maxRoomSizeX = 5
+	var maxRoomSizeX = 4
 	
 	var minRoomSizeZ = 3
-	var maxRoomSizeZ = 5
+	var maxRoomSizeZ = 4
 
 	func setRoomPosAndSize(maxX, maxZ):
 		pos = Vector2(randi_range(0, maxX), randi_range(0,maxZ))
