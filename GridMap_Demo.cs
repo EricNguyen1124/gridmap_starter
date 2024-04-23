@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Scenes.Room;
 using System.Linq;
+using Utilities.DebugDraw;
 
 public partial class GridMap_Demo : GridMap
 {
@@ -47,7 +48,7 @@ public partial class GridMap_Demo : GridMap
 			}
 			potentialRoom.Id = roomsPlaced;
 			roomArray.Add(potentialRoom);
-			pointsList[roomsPlaced] = potentialRoom.worldPosition;
+			pointsList[roomsPlaced] = potentialRoom.WorldPosition;
 			roomsPlaced += 1;
 			DrawRooms();
 		}
@@ -56,9 +57,91 @@ public partial class GridMap_Demo : GridMap
 		GodotObject DelaunayShellNode = (GodotObject)DelaunayShellScript.New();
 		var args = Variant.CreateFrom(pointsList);
 		var huh = DelaunayShellNode.Call("get_triangles", pointsList);
-		var idk = huh.As<Godot.Collections.Array>();
-		GD.Print(huh);
+		
+		foreach (var edge in huh.As<Godot.Collections.Array>())
+		{
+			Vector2 fromPoint = edge.As<Godot.Collections.Array>()[0].As<Vector2>();
+			Room fromRoom = roomArray.Single(r => r.WorldPosition == fromPoint);
+
+			Vector2 toPoint = edge.As<Godot.Collections.Array>()[1].As<Vector2>();
+			Room toRoom = roomArray.Single(r => r.WorldPosition == toPoint);
+
+			if (!fromRoom.Edges.Any(e => e.RoomId == toRoom.Id))
+			{
+				Edge e = new(toRoom.Id);
+				fromRoom.Edges.Add(e);
+			}
+
+			if (!toRoom.Edges.Any(e => e.RoomId == fromRoom.Id))
+			{
+				Edge e = new(fromRoom.Id);
+				toRoom.Edges.Add(e);
+			}
+		}
+		
+		int attempts = 0;
+		List<Room> visitedRooms = new();
+
+		while (visitedRooms.Count != roomArray.Count)
+		{
+			if (attempts > 100) 
+			{
+				GD.PrintErr("Failed to pick edges");
+				return;
+			};
+
+			foreach (Room room in roomArray)
+			{
+				foreach (Edge edge in room.Edges)
+				{
+					edge.Active = true;
+				}
+			}
+			Dfs(visitedRooms, roomArray.Single(r => r.Id == 0));
+			visitedRooms.Clear();
+			Dfs(visitedRooms, roomArray.Single(r => r.Id == 0), true);
+			attempts += 1;
+		}
+		var label = DebugDraw.GenerateLabel("Hi",new Vector2(3,5));
+		AddChild(label);
+		GD.Print(attempts);
+		GD.Print("hi");
 	}
+
+	private void Dfs(List<Room> visited, Room room, bool checkActive = false)
+	{
+		if (!visited.Contains(room))
+		{
+			visited.Add(room);
+			List<Edge> edges = checkActive ? room.Edges.FindAll(e => e.Active) : room.Edges;
+			foreach (Edge edge in edges)
+			{
+				var toRoom = roomArray.Single((r) => r.Id == edge.RoomId);
+
+				if (!checkActive && GD.Randf() > percentPaths && room.Edges.Count(e => e.Active) > 1)
+				{
+					edge.Active = false;
+					toRoom.SetEdgeActive(room.Id, false);
+				}
+
+				Dfs(visited, toRoom, checkActive);
+			}
+		}
+	}
+
+	// private void DfsActive(List<Room> visited, Room room)
+	// {
+	// 	if (!visited.Contains(room))
+	// 	{
+	// 		visited.Add(room);
+	// 		List<Edge> activeEdges = room.Edges.FindAll(e => e.Active);
+	// 		foreach (Edge edge in activeEdges)
+	// 		{
+	// 			var toRoom = roomArray.Single((r) => r.Id == edge.RoomId);
+	// 			DfsActive(visited, toRoom);
+	// 		}
+	// 	}
+	// }
 
 	private void DrawRooms()
 	{
@@ -66,9 +149,9 @@ public partial class GridMap_Demo : GridMap
 
 		foreach (var room in roomArray)
 		{
-			for (int i = 0; i < room.width; i++)
+			for (int i = 0; i < room.Width; i++)
 			{
-				for (int j = 0; j < room.height; j++)
+				for (int j = 0; j < room.Height; j++)
 				{
 					SetCellItem(new Vector3I(room.position.X + i, 0, room.position.Y + j), 0);
 				}

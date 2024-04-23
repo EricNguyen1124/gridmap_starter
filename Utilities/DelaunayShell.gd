@@ -9,8 +9,16 @@ func get_triangles(points):
 	var edges = [];
 	for triangle in triangles:
 		var edge = [];
-		edge.append(triangle.edge_ab)
-		edge.append(triangle.edge_bc)
-		edge.append(triangle.edge_ca)
+		edge.append(triangle.a)
+		edge.append(triangle.b)
 		edges.append(edge)
+		edge = []
+		edge.append(triangle.b)
+		edge.append(triangle.c)
+		edges.append(edge)
+		edge = []
+		edge.append(triangle.c)
+		edge.append(triangle.a)
+		edges.append(edge)
+		edge = []
 	return edges;
