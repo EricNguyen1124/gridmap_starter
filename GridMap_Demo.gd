@@ -91,11 +91,11 @@ func generateLevel():
 					set_cell_item(Vector3(coord.x,0,coord.y), 0)
 				drawnEdge.append(Vector2(room.id, edge.roomId))
 				
-	var task_id = WorkerThreadPool.add_group_task(mtRandomPath, pathTasks.size())
-	WorkerThreadPool.wait_for_group_task_completion(task_id)
-	for result in pathTasks.values():
-		for coord in result:
-			set_cell_item(Vector3(coord.x,0,coord.y), 0)
+	#var task_id = WorkerThreadPool.add_group_task(mtRandomPath, pathTasks.size())
+	#WorkerThreadPool.wait_for_group_task_completion(task_id)
+	#for result in pathTasks.values():
+		#for coord in result:
+			#set_cell_item(Vector3(coord.x,0,coord.y), 0)
 	if DEBUG_RENDER_EDGES:
 		show_edges()
 
