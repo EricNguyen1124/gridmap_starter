@@ -99,14 +99,13 @@ public partial class GridMap_Demo : GridMap
 					edge.Active = true;
 				}
 			}
+			visitedRooms.Clear();
 			Dfs(visitedRooms, roomArray.Single(r => r.Id == 0));
 			visitedRooms.Clear();
 			Dfs(visitedRooms, roomArray.Single(r => r.Id == 0), true);
 			attempts += 1;
 		}
-		var label = DebugDraw.GenerateLabel("Hi",new Vector2(3,5));
 		ShowEdges();
-		AddChild(label);
 		GD.Print(attempts);
 		GD.Print("hi");
 	}
@@ -121,7 +120,7 @@ public partial class GridMap_Demo : GridMap
 			{
 				var toRoom = roomArray.Single((r) => r.Id == edge.RoomId);
 
-				if (!checkActive && GD.Randf() > percentPaths && room.Edges.Count(e => e.Active) > 1)
+				if (!checkActive && GD.Randf() > percentPaths)// && room.Edges.Count(e => e.Active) > 1)
 				{
 					edge.Active = false;
 					toRoom.SetEdgeActive(room.Id, false);
@@ -150,13 +149,13 @@ public partial class GridMap_Demo : GridMap
 	{
 		foreach (Room room in roomArray)
 		{
-			DebugDraw3D.DrawSphere(new Vector3(room.position.X, 0, room.position.Y), 1f, Colors.Blue);
+			DebugDraw3D.DrawSphere(new Vector3(room.WorldPosition.X, 0, room.WorldPosition.Y), 0.5f, Colors.Blue);			
 			foreach (Edge edge in room.Edges.FindAll(e => e.Active))
 			{
 				Room toRoom = roomArray.Single(r => r.Id == edge.RoomId);
 				DebugDraw3D.DrawArrow(
-					new Vector3(room.position.X, 0, room.position.Y),
-					new Vector3(toRoom.position.X, 0, toRoom.position.Y),
+					new Vector3(room.WorldPosition.X, 0, room.WorldPosition.Y),
+					new Vector3(toRoom.WorldPosition.X, 0, toRoom.WorldPosition.Y),
 					Colors.Yellow,
 					0.05f
 				);
@@ -175,7 +174,7 @@ public partial class GridMap_Demo : GridMap
 			{
 				for (int j = 0; j < room.Height; j++)
 				{
-					SetCellItem(new Vector3I(room.position.X + i, 0, room.position.Y + j), 0);
+					SetCellItem(new Vector3I(room.GridCoordinates.X + i, 0, room.GridCoordinates.Y + j), 0);
 				}
 			}
 		}
