@@ -103,6 +103,7 @@ public partial class GridMap_Demo : GridMap
 			attempts += 1;
 		}
 		var label = DebugDraw.GenerateLabel("Hi",new Vector2(3,5));
+		ShowEdges();
 		AddChild(label);
 		GD.Print(attempts);
 		GD.Print("hi");
@@ -142,6 +143,26 @@ public partial class GridMap_Demo : GridMap
 	// 		}
 	// 	}
 	// }
+
+	private void ShowEdges()
+	{
+		DebugDraw3D.ClearAll();
+		foreach (Room room in roomArray)
+		{
+			foreach (Edge edge in room.Edges.FindAll(e => e.Active))
+			{
+				Room toRoom = roomArray.Single(r => r.Id == edge.RoomId);
+				DebugDraw3D.DrawArrow(
+					new Vector3(room.WorldPosition.X, 0 , room.WorldPosition.Y),
+					new Vector3(room.WorldPosition.X, 0 , room.WorldPosition.Y),
+					new Color(1,1,0),
+					0.02f,
+					false,
+					100
+				);
+			}
+		}
+	}
 
 	private void DrawRooms()
 	{
