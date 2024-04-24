@@ -105,11 +105,66 @@ public partial class GridMap_Demo : GridMap
 			Dfs(visitedRooms, roomArray.Single(r => r.Id == 0), true);
 			attempts += 1;
 		}
-		ShowEdges();
+
+		RandomPath(roomArray[0], roomArray[1]);
 		GD.Print(attempts);
 		GD.Print("hi");
 	}
 
+	enum CellState {OPEN, FORCED, BLOCKED}
+	private void RandomPath(Room fromRoom, Room toRoom, float wiggliness = 1)
+	{
+		(float x, float y) fromPos = (fromRoom.WorldPosition.X, fromRoom.WorldPosition.Y);
+		(float x, float y) toPos = (toRoom.WorldPosition.X, toRoom.WorldPosition.Y);
+
+		List<(float x, float y)> openCells = new();
+		Dictionary<(float x, float y), CellState> cellStates = new();
+
+		for (int x = 0; x < levelSizeX + 5; x++)
+		{
+			for (int y = 0; y < levelSizeZ + 5; y++)
+			{
+				openCells.Add((x, y));
+				cellStates[(x, y)] = CellState.OPEN;
+			}
+		}
+
+		openCells.Remove(fromPos);
+		openCells.Remove(toPos);
+		cellStates[fromPos] = CellState.FORCED;
+		cellStates[toPos] = CellState.FORCED;
+
+		AStarGrid2D astar = new();
+		astar.Region = new Rect2I(0, 0 , levelSizeX+5, levelSizeZ+5);
+		astar.DiagonalMode = AStarGrid2D.DiagonalModeEnum.Never;
+		astar.Update();
+		var witness = Astar(astar, fromRoom, toRoom, cellStates);
+		GD.Print(witness);
+	}
+
+	private Vector2[] Astar(AStarGrid2D astar, Room from, Room to, Dictionary<(float x, float y), CellState> cellStates)
+	{
+		for (int x = 0; x < levelSizeX + 5; x++)
+		{
+			for (int y = 0; y < levelSizeZ + 5; y++)
+			{
+				Room room = null;
+				foreach (Room r in roomArray)
+				{
+					if (r.IsPointInside(new Vector2(x,y)))
+					{
+						room = r;
+					}
+				}
+				if (cellStates[(x,y)] == CellState.BLOCKED || (room != null && room.Id != from.Id && room.Id != to.Id))
+				{
+					astar.SetPointSolid(new Vector2I(x, y), true);
+				}
+			}
+		}
+
+		return astar.GetPointPath(new Vector2I((int)from.WorldPosition.X,(int)from.WorldPosition.Y), new Vector2I((int)to.WorldPosition.X,(int)to.WorldPosition.Y));
+	}
 	private void Dfs(List<Room> visited, Room room, bool checkActive = false)
 	{
 		if (!visited.Contains(room))
@@ -130,20 +185,6 @@ public partial class GridMap_Demo : GridMap
 			}
 		}
 	}
-
-	// private void DfsActive(List<Room> visited, Room room)
-	// {
-	// 	if (!visited.Contains(room))
-	// 	{
-	// 		visited.Add(room);
-	// 		List<Edge> activeEdges = room.Edges.FindAll(e => e.Active);
-	// 		foreach (Edge edge in activeEdges)
-	// 		{
-	// 			var toRoom = roomArray.Single((r) => r.Id == edge.RoomId);
-	// 			DfsActive(visited, toRoom);
-	// 		}
-	// 	}
-	// }
 
 	private void ShowEdges()
 	{
