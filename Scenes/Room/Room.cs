@@ -37,7 +37,7 @@ namespace Scenes.Room
 			Height = rng.RandiRange(minRoomSizeZ, maxRoomSizeZ);
 			var iW = Width-1 / 2;
 			var iH = Height-1 / 2;
-			WorldPosition = new Vector2((float)(position.X + iW + 0.5), (float)(position.Y + iH + 0.5));
+			WorldPosition = new Vector2((float)(position.X + iW + 0.5)*2.0f, (float)(position.Y + iH + 0.5)*2.0f);
 		}
 
 		public bool CheckRoomCollide(Room room)

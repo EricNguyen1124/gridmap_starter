@@ -19,6 +19,7 @@ public partial class GridMap_Demo : GridMap
 	{
 		SetCellItem(new Vector3I(0,0,0), 0);
 		SetCellItem(new Vector3I(levelSizeX, 0, levelSizeZ), 0);
+		DebugDraw3D.DebugEnabled = true;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -29,6 +30,7 @@ public partial class GridMap_Demo : GridMap
 			roomArray.Clear();
 			GenerateLevel();
 		}
+		ShowEdges();
 	}
 
 	private void GenerateLevel()
@@ -146,23 +148,22 @@ public partial class GridMap_Demo : GridMap
 
 	private void ShowEdges()
 	{
-		DebugDraw3D.ClearAll();
 		foreach (Room room in roomArray)
 		{
+			DebugDraw3D.DrawSphere(new Vector3(room.position.X, 0, room.position.Y), 1f, Colors.Blue);
 			foreach (Edge edge in room.Edges.FindAll(e => e.Active))
 			{
 				Room toRoom = roomArray.Single(r => r.Id == edge.RoomId);
 				DebugDraw3D.DrawArrow(
-					new Vector3(room.WorldPosition.X, 0 , room.WorldPosition.Y),
-					new Vector3(room.WorldPosition.X, 0 , room.WorldPosition.Y),
-					new Color(1,1,0),
-					0.02f,
-					false,
-					100
+					new Vector3(room.position.X, 0, room.position.Y),
+					new Vector3(toRoom.position.X, 0, toRoom.position.Y),
+					Colors.Yellow,
+					0.05f
 				);
 			}
 		}
 	}
+
 
 	private void DrawRooms()
 	{
