@@ -7,10 +7,12 @@ using Utilities.DebugDraw;
 
 public partial class GridMap_Demo : GridMap
 {
+	static readonly Random rng = new Random();
+
 	private int levelSizeZ = 30;
 	private int levelSizeX = 40;
-	private int numberOfRooms = 6;
-	private float percentPaths = 0.5f;
+	private int numberOfRooms = 7;
+	private float percentPaths = 0.6f;
 
 	private List<Room> roomArray = new();
 
@@ -52,7 +54,7 @@ public partial class GridMap_Demo : GridMap
 			roomArray.Add(potentialRoom);
 			pointsList[roomsPlaced] = potentialRoom.WorldPosition;
 			roomsPlaced += 1;
-			DrawRooms();
+			SetRoomCells();
 		}
 
 		GDScript DelaunayShellScript = GD.Load<GDScript>("res://Utilities/DelaunayShell.gd");
@@ -106,19 +108,37 @@ public partial class GridMap_Demo : GridMap
 			attempts += 1;
 		}
 
-		RandomPath(roomArray[0], roomArray[1]);
+		List<(int, int)> drawnEdge = new();
+		foreach(Room room in roomArray)
+		{
+			foreach(Edge edge in room.Edges.FindAll(e => e.Active))
+			{
+				if (!drawnEdge.Contains((room.Id, edge.RoomId)) && !drawnEdge.Contains((edge.RoomId, room.Id)))
+				{
+					List<(int x, int y)> path = RandomPath(room, roomArray.Single(r => r.Id == edge.RoomId), 4);
+
+					foreach (var (x, y) in path)
+					{
+						SetCellItem(new Vector3I(x, 0, y), 0);
+					}
+
+					drawnEdge.Add((room.Id, edge.RoomId));
+				}
+			}
+		}
+		
 		GD.Print(attempts);
 		GD.Print("hi");
 	}
 
 	enum CellState {OPEN, FORCED, BLOCKED}
-	private void RandomPath(Room fromRoom, Room toRoom, float wiggliness = 1)
+	private List<(int x, int y)> RandomPath(Room fromRoom, Room toRoom, float wiggliness = 1)
 	{
-		(float x, float y) fromPos = (fromRoom.WorldPosition.X, fromRoom.WorldPosition.Y);
-		(float x, float y) toPos = (toRoom.WorldPosition.X, toRoom.WorldPosition.Y);
+		(int x, int y) fromPos = (fromRoom.GridCoordinates.X, fromRoom.GridCoordinates.Y);
+		(int x, int y) toPos = (toRoom.GridCoordinates.X, toRoom.GridCoordinates.Y);
 
-		List<(float x, float y)> openCells = new();
-		Dictionary<(float x, float y), CellState> cellStates = new();
+		List<(int x, int y)> openCells = new();
+		Dictionary<(int x, int y), CellState> cellStates = new();
 
 		for (int x = 0; x < levelSizeX + 5; x++)
 		{
@@ -138,11 +158,46 @@ public partial class GridMap_Demo : GridMap
 		astar.Region = new Rect2I(0, 0 , levelSizeX+5, levelSizeZ+5);
 		astar.DiagonalMode = AStarGrid2D.DiagonalModeEnum.Never;
 		astar.Update();
-		var witness = Astar(astar, fromRoom, toRoom, cellStates);
-		GD.Print(witness);
+		List<(int x, int y)> witness = Astar(astar, fromRoom, toRoom, cellStates);
+		while (openCells.Count != 0)
+		{
+			List<(int x, int y)> openPathCells = witness.FindAll(c => cellStates[c] == CellState.OPEN);
+
+			float pathWeight = openPathCells.Count * wiggliness;
+			float nonPathWeight = openCells.Count - openPathCells.Count;
+			float totalWeight = pathWeight + nonPathWeight;
+
+			(int x, int y) randomCell;
+			if (rng.NextDouble() * totalWeight <= pathWeight)
+			{
+				randomCell = openPathCells[rng.Next(openPathCells.Count)];
+			}
+			else
+			{
+				List<(int x, int y)> nonPathOpenCells = openCells.FindAll(c => !witness.Contains(c));
+				randomCell = nonPathOpenCells[rng.Next(openPathCells.Count)];
+			}
+
+			cellStates[randomCell] = CellState.BLOCKED;
+			openCells.Remove(randomCell);
+
+			if (witness.Contains(randomCell))
+			{
+				List<(int x, int y)> newPath = Astar(astar, fromRoom, toRoom, cellStates);
+				if (!newPath.Any())
+				{
+					cellStates[randomCell] = CellState.FORCED;
+				}
+				else
+				{
+					witness = newPath;
+				}
+			}
+		}
+		return witness;
 	}
 
-	private Vector2[] Astar(AStarGrid2D astar, Room from, Room to, Dictionary<(float x, float y), CellState> cellStates)
+	private List<(int x, int y)> Astar(AStarGrid2D astar, Room from, Room to, Dictionary<(int x, int y), CellState> cellStates)
 	{
 		for (int x = 0; x < levelSizeX + 5; x++)
 		{
@@ -162,9 +217,9 @@ public partial class GridMap_Demo : GridMap
 				}
 			}
 		}
-
-		return astar.GetPointPath(new Vector2I((int)from.WorldPosition.X,(int)from.WorldPosition.Y), new Vector2I((int)to.WorldPosition.X,(int)to.WorldPosition.Y));
+		return astar.GetPointPath(from.GridCoordinates, to.GridCoordinates).Select(v => ((int)v.X, (int)v.Y)).ToList();
 	}
+
 	private void Dfs(List<Room> visited, Room room, bool checkActive = false)
 	{
 		if (!visited.Contains(room))
@@ -175,7 +230,7 @@ public partial class GridMap_Demo : GridMap
 			{
 				var toRoom = roomArray.Single((r) => r.Id == edge.RoomId);
 
-				if (!checkActive && GD.Randf() > percentPaths)// && room.Edges.Count(e => e.Active) > 1)
+				if (!checkActive && rng.NextDouble() > percentPaths)// && room.Edges.Count(e => e.Active) > 1)
 				{
 					edge.Active = false;
 					toRoom.SetEdgeActive(room.Id, false);
@@ -204,8 +259,7 @@ public partial class GridMap_Demo : GridMap
 		}
 	}
 
-
-	private void DrawRooms()
+	private void SetRoomCells()
 	{
 		Clear();
 

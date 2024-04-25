@@ -82,7 +82,7 @@ func generateLevel():
 	
 	var drawnEdge = []
 	for room in roomArray:
-		drawText(room.to_string(), room.pos * 2)
+		#drawText(room.to_string(), room.pos * 2)
 		for edge in room.edges.filter(func(e): return e.active == true):
 			if !drawnEdge.has(Vector2(room.id, edge.roomId)) && !drawnEdge.has(Vector2(edge.roomId, room.id)):
 				pathTasks[[room.id, edge.roomId]] = []
