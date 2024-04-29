@@ -5,38 +5,35 @@ using Scenes.Room;
 using System.Linq;
 using Utilities.DebugDraw;
 
-public partial class GridMap_Demo : GridMap
+public partial class DungeonGrid : GridMap
 {
-	static readonly Random rng = new Random();
-
 	private int levelSizeZ = 30;
 	private int levelSizeX = 40;
 	private int numberOfRooms = 7;
 	private float percentPaths = 0.6f;
+	static readonly Random rng = new Random();
+	public List<Room> roomArray = new();
 
-	private List<Room> roomArray = new();
+	private Material testMat;
 
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-		SetCellItem(new Vector3I(0,0,0), 0);
-		SetCellItem(new Vector3I(levelSizeX, 0, levelSizeZ), 0);
-		DebugDraw3D.DebugEnabled = true;
-	}
+    public override void _Ready()
+    {
+        testMat = GD.Load<Material>("res://assets/test.material");
+    }
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
+    public override void _Process(double delta)
 	{
 		if (Input.IsActionJustPressed("ui_down"))
 		{
 			roomArray.Clear();
 			GenerateLevel();
 		}
-		ShowEdges();
+		//ShowEdges();
 	}
 
-	private void GenerateLevel()
+	public void GenerateLevel()
 	{
+		GD.Print("OK");
 		int roomsPlaced = 0;
 		Vector2[] pointsList = new Vector2[numberOfRooms];
 
@@ -119,7 +116,7 @@ public partial class GridMap_Demo : GridMap
 
 					foreach (var (x, y) in path)
 					{
-						SetCellItem(new Vector3I(x, 0, y), 0);
+						SetCellItem(new Vector3I(x, 0, y), 1);
 					}
 
 					drawnEdge.Add((room.Id, edge.RoomId));
@@ -127,8 +124,16 @@ public partial class GridMap_Demo : GridMap
 			}
 		}
 		
-		GD.Print(attempts);
-		GD.Print("hi");
+		var idk = GetMeshes();
+		foreach(var wtf in idk)
+		{
+			var mesh = wtf.As<ArrayMesh>();
+			if (mesh != null)
+			{
+				mesh.SurfaceSetMaterial(0, testMat);
+			}
+		}
+		GD.Print(GetMeshes());
 	}
 
 	enum CellState {OPEN, FORCED, BLOCKED}
@@ -269,7 +274,7 @@ public partial class GridMap_Demo : GridMap
 			{
 				for (int j = 0; j < room.Height; j++)
 				{
-					SetCellItem(new Vector3I(room.GridCoordinates.X + i, 0, room.GridCoordinates.Y + j), 0);
+					SetCellItem(new Vector3I(room.GridCoordinates.X + i, 0, room.GridCoordinates.Y + j), 1);
 				}
 			}
 		}

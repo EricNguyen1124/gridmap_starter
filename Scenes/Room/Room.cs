@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Scenes.Room
 {
-	public partial class Room : Node3D
+	public partial class Room
 	{
 		public int Id;
 		public Vector2I GridCoordinates;
@@ -17,16 +17,6 @@ namespace Scenes.Room
 		private const int maxRoomSizeX = 4;
 		private const int minRoomSizeZ = 3;
 		private const int maxRoomSizeZ = 4;
-
-		// Called when the node enters the scene tree for the first time.
-		public override void _Ready()
-		{
-		}
-
-		// Called every frame. 'delta' is the elapsed time since the previous frame.
-		public override void _Process(double delta)
-		{
-		}
 
 		public void SetRoomPosAndSize(int maxX, int maxZ)
 		{
