@@ -19,6 +19,10 @@ public partial class World : Node3D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		if (Input.IsActionJustPressed("ui_up"))
+		{
+			//start battle
+		}
 	}
 
 	private void SpawnPlayer()

@@ -6,7 +6,7 @@ public partial class Player : Node3D
 {
 	private const float SPEED = 2.0f;
 
-	enum PlayerState {IDLE, MOVING, TURNING}
+	enum PlayerState {IDLE, MOVING, TURNING, BATTLING}
 	private PlayerState state = PlayerState.IDLE;
 	public Vector2 gridPosition;
 	public Vector2 newGridPosition;
