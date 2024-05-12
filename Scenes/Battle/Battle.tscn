@@ -13,3 +13,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 0.643, 2.08165e-
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.995818, 0, -2.33418)
 
 [node name="Enemy" parent="Marker3D" instance=ExtResource("1_dlmcl")]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Button" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 805.0
+offset_top = 503.0
+offset_right = 922.0
+offset_bottom = 548.0
+text = "god damn"

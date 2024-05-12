@@ -33,7 +33,6 @@ public partial class DungeonGrid : GridMap
 
 	public void GenerateLevel()
 	{
-		GD.Print("OK");
 		int roomsPlaced = 0;
 		Vector2[] pointsList = new Vector2[numberOfRooms];
 
@@ -124,16 +123,16 @@ public partial class DungeonGrid : GridMap
 			}
 		}
 		
-		var idk = GetMeshes();
-		foreach(var wtf in idk)
-		{
-			var mesh = wtf.As<ArrayMesh>();
-			if (mesh != null)
-			{
-				mesh.SurfaceSetMaterial(0, testMat);
-			}
-		}
-		GD.Print(GetMeshes());
+		// var idk = GetMeshes();
+		// foreach(var wtf in idk)
+		// {
+		// 	var mesh = wtf.As<ArrayMesh>();
+		// 	if (mesh != null)
+		// 	{
+		// 		mesh.SurfaceSetMaterial(0, testMat);
+		// 	}
+		// }
+		// GD.Print(GetMeshes());
 	}
 
 	enum CellState {OPEN, FORCED, BLOCKED}
