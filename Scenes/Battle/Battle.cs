@@ -5,13 +5,18 @@ using System.Linq;
 
 public partial class Battle : Node3D
 {
+	private Control battleUI;
+
 	private List<Combatant> combatants = new();
 	private Combatant currentCombatant;
 
-	enum BATTLE_STATE {TURN_IN_PROGRESS, TURN_ENDED}
-	private BATTLE_STATE currentState = BATTLE_STATE.TURN_ENDED;
+
+	enum BATTLE_STATE {TURN_IN_PROGRESS, TURN_ENDED, TURN_STARTED}
+	private BATTLE_STATE currentState = BATTLE_STATE.TURN_STARTED;
 	public override void _Ready()
 	{
+		battleUI = GetNode<Control>("Control");
+		battleUI.Visible = false;
 		var player = new Combatant
 		{
 			Name = "jim",
@@ -46,19 +51,32 @@ public partial class Battle : Node3D
 
 	public override void _Process(double delta)
 	{
-		if (currentState == BATTLE_STATE.TURN_ENDED)
+		switch (currentState)
 		{
-			if (currentCombatant.PlayerControlled)
-			{
-				if (Input.IsActionJustPressed("ui_left"))
+			case BATTLE_STATE.TURN_STARTED:
+				if (currentCombatant.PlayerControlled)
 				{
-					TakePlayerTurn();
+					if (Input.IsActionJustPressed("ui_left"))
+					{
+						TakePlayerTurn();
+					}
 				}
-			}
-			else
-			{
-				TakeEnemyTurn();
-			}
+				else
+				{
+					// Battle class should ask Combatant for turn, while giving the Combatant the current state of the battle
+					TakeEnemyTurn();
+				}
+				break;
+
+			case BATTLE_STATE.TURN_ENDED:
+				currentCombatant = FindNextCombatant();
+				battleUI.Visible = currentCombatant.PlayerControlled;
+				currentState = BATTLE_STATE.TURN_STARTED;
+				break;
+
+			case BATTLE_STATE.TURN_IN_PROGRESS:
+			default:
+				break;
 		}
 
 		if (!combatants.Any(c => !c.PlayerControlled && c.Health > 0))
@@ -76,7 +94,6 @@ public partial class Battle : Node3D
 		enemy.Health -= 1.0f;
 		GD.Print(enemy.Health);
 		currentState = BATTLE_STATE.TURN_ENDED;
-		currentCombatant = FindNextCombatant();
 	}
 
 	private async void TakeEnemyTurn()
@@ -88,7 +105,6 @@ public partial class Battle : Node3D
 		player.Health -= 1.0f;
 		GD.Print(player.Health);
 		currentState = BATTLE_STATE.TURN_ENDED;
-		currentCombatant = FindNextCombatant();
 	}
 
 	private Combatant FindNextCombatant()

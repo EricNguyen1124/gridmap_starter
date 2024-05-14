@@ -1,7 +1,10 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
+
+public enum COMBATANT_COMMANDS {ATTACK, GUARD, SKILL, ITEM};
 
 public partial class Combatant
 {
@@ -13,6 +16,22 @@ public partial class Combatant
 	public bool PlayerControlled;
     public List<Skill> skills;
 
+    public void TakeTurn(COMBATANT_COMMANDS command, Combatant target, string specifier = null)
+    {
+        switch (command)
+        {
+            case COMBATANT_COMMANDS.ATTACK:
+                target.Health -= this.Attack;
+                break;
+            case COMBATANT_COMMANDS.SKILL:
+                var skill = skills.Single(s => s.Name == specifier);
+                skill.action(this, target);
+                break;
+            case COMBATANT_COMMANDS.GUARD:
+            default:
+                break;
+        }
+    }
 }
 
 public class Skill
