@@ -58,6 +58,7 @@ public partial class Battle : Node3D
 				{
 					if (Input.IsActionJustPressed("ui_left"))
 					{
+						// Take info from UI and call TakeTurn on Combatant
 						TakePlayerTurn();
 					}
 				}
