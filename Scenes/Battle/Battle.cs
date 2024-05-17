@@ -99,28 +99,6 @@ public partial class Battle : Node3D
 		}
 	}
 
-	private async void TakePlayerTurn()
-	{
-		GD.Print("player turn!");
-		currentState = BATTLE_STATE.TURN_IN_PROGRESS;
-		var enemy = combatants.First(c => c.CombatantName == "enemy");
-		await ToSignal(GetTree().CreateTimer(2), "timeout");
-		enemy.Health -= 1.0f;
-		GD.Print(enemy.Health);
-		currentState = BATTLE_STATE.TURN_ENDED;
-	}
-
-	// private async void TakeEnemyTurn()
-	// {
-	// 	GD.Print("enemy turn!");
-	// 	currentState = BATTLE_STATE.TURN_IN_PROGRESS;
-	// 	await ToSignal(GetTree().CreateTimer(2), "timeout");
-	// 	var player = combatants.First(c => c.CombatantName == "jim");
-	// 	player.Health -= 1.0f;
-	// 	GD.Print(player.Health);
-	// 	currentState = BATTLE_STATE.TURN_ENDED;
-	// }
-
 	private ICombatant FindNextCombatant()
 	{
 		combatants = combatants.OrderByDescending(c => c.Speed).ToList();
