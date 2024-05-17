@@ -8,6 +8,9 @@
 script = ExtResource("1_5isy7")
 
 [node name="DungeonGrid" parent="." instance=ExtResource("1_mlvky")]
+data = {
+"cells": PackedInt32Array(65535, 1, 0, 0, 1, 65542, 65536, 1, 65542, 65533, 1, 1)
+}
 
 [node name="Player" parent="." instance=ExtResource("2_64vdp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 3)

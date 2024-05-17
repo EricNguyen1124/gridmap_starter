@@ -1,4 +1,5 @@
 using Godot;
+using Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,38 +7,21 @@ using System.Runtime.CompilerServices;
 
 public enum COMBATANT_COMMANDS {ATTACK, GUARD, SKILL, ITEM};
 
-public partial class Combatant
+public class Combatant: ICombatant
 {
-    public string Name;
-    public float Health;
-    public float Mana;
-	public float Speed;
-    public float Attack;
-	public bool PlayerControlled;
-    public List<Skill> skills;
-
-    public void TakeTurn(COMBATANT_COMMANDS command, Combatant target, string specifier = null)
-    {
-        switch (command)
-        {
-            case COMBATANT_COMMANDS.ATTACK:
-                target.Health -= this.Attack;
-                break;
-            case COMBATANT_COMMANDS.SKILL:
-                var skill = skills.Single(s => s.Name == specifier);
-                skill.action(this, target);
-                break;
-            case COMBATANT_COMMANDS.GUARD:
-            default:
-                break;
-        }
-    }
+    public string CombatantName { get; set; }
+    public float Health { get; set; }
+    public float Mana { get; set; }
+	public float Speed { get; set; }
+    public float Attack { get; set; }
+	public bool PlayerControlled { get; set; }
+    public List<Skill> Skills { get; set; }
 }
 
 public class Skill
 {
     public string Name;
-    public Action<Combatant, Combatant> action;
+    public Action<ICombatant, ICombatant> Action;
 }
 
 public static class SkillList
@@ -46,7 +30,7 @@ public static class SkillList
     {
         new Skill {
             Name = "Big Strike",
-            action = (self, target) => {
+            Action = (self, target) => {
                 target.Health -= self.Attack * 2;
                 self.Mana -= 10;
             }
