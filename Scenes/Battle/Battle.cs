@@ -39,12 +39,11 @@ public partial class Battle : Node3D
 			PlayerControlled = false,
 			Skills = new() {
 				SkillList.AllSkills.First()
-			},
-			Behavior = new AIBehavior {
-				MakeTurnDecision = (combatants) => {
-					return (combatants.First(), COMBATANT_COMMANDS.ATTACK, null);
-				}
 			}
+		};
+		enemy.MakeTurnDecision = (combatants) => {
+				if (enemy.Health < 1.0f) { GD.Print("I'M DYING!!"); }
+				return (combatants.First(c => c.CombatantName != enemy.CombatantName), COMBATANT_COMMANDS.ATTACK, null);
 		};
 
 		combatants.Add(player);
@@ -74,7 +73,7 @@ public partial class Battle : Node3D
 				{
 					// Battle class should ask Combatant for turn, while giving the Combatant the current state of the battle
 					var enemy = (Enemy)currentCombatant;
-					(ICombatant target, COMBATANT_COMMANDS command, string specifier) turnParamaters = enemy.Behavior.MakeTurnDecision(combatants);
+					(ICombatant target, COMBATANT_COMMANDS command, string specifier) turnParamaters = enemy.MakeTurnDecision(combatants);
 
 					currentState = BATTLE_STATE.TURN_IN_PROGRESS;
 					currentCombatant.TakeTurn(turnParamaters.target, turnParamaters.command, turnParamaters.specifier);

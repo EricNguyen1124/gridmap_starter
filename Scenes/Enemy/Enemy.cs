@@ -3,15 +3,9 @@ using Interfaces;
 using System;
 using System.Collections.Generic;
 
-public class AIBehavior
-{
-	public Func<List<ICombatant>, (ICombatant, COMBATANT_COMMANDS, string)> MakeTurnDecision { get; set;}
-}
-
 public partial class Enemy : Node3D, ICombatant
 {
-    public AIBehavior Behavior { get; set; }
-
+    public Func<List<ICombatant>, (ICombatant, COMBATANT_COMMANDS, string)> MakeTurnDecision { get; set;}
     public string CombatantName { get; set; }
     public float Health { get; set; }
     public float Mana { get; set; }
