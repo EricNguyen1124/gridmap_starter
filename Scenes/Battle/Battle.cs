@@ -73,10 +73,10 @@ public partial class Battle : Node3D
 				{
 					// Battle class should ask Combatant for turn, while giving the Combatant the current state of the battle
 					var enemy = (Enemy)currentCombatant;
-					(ICombatant target, COMBATANT_COMMANDS command, string specifier) turnParamaters = enemy.MakeTurnDecision(combatants);
+					(ICombatant target, COMBATANT_COMMANDS command, string specifier) = enemy.MakeTurnDecision(combatants);
 
 					currentState = BATTLE_STATE.TURN_IN_PROGRESS;
-					currentCombatant.TakeTurn(turnParamaters.target, turnParamaters.command, turnParamaters.specifier);
+					currentCombatant.TakeTurn(target, command, specifier);
 					currentState = BATTLE_STATE.TURN_ENDED;
 				}
 			break;
