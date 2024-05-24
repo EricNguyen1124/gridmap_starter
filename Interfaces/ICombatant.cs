@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Classes.Combatant;
 
 namespace Interfaces {
     public interface ICombatant 

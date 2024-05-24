@@ -3,6 +3,8 @@ using Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Classes.Combatant;
+using Scenes.Enemy;
 
 public partial class Battle : Node3D
 {
@@ -39,11 +41,8 @@ public partial class Battle : Node3D
 			PlayerControlled = false,
 			Skills = new() {
 				SkillList.AllSkills.First()
-			}
-		};
-		enemy.MakeTurnDecision = (combatants) => {
-				if (enemy.Health < 1.0f) { GD.Print("I'M DYING!!"); }
-				return (combatants.First(c => c.CombatantName != enemy.CombatantName), COMBATANT_COMMANDS.ATTACK, null);
+			},
+			Behavior = ENEMY_BEHAVIOR.NORMAL
 		};
 
 		combatants.Add(player);
@@ -59,9 +58,9 @@ public partial class Battle : Node3D
 			case BATTLE_STATE.TURN_STARTED:
 				if (currentCombatant.PlayerControlled)
 				{
+					// Take Player Turn (only if message received from UI)
 					if (Input.IsActionJustPressed("ui_left"))
 					{
-						// Take info from UI and call TakeTurn on Combatant
 						var enemy = combatants.First(c => c.CombatantName == "enemy");
 
 						currentState = BATTLE_STATE.TURN_IN_PROGRESS;
@@ -71,7 +70,8 @@ public partial class Battle : Node3D
 				}
 				else
 				{
-					// Battle class should ask Combatant for turn, while giving the Combatant the current state of the battle
+					// Take AI Turn
+
 					var enemy = (Enemy)currentCombatant;
 					(ICombatant target, COMBATANT_COMMANDS command, string specifier) = enemy.MakeTurnDecision(combatants);
 
