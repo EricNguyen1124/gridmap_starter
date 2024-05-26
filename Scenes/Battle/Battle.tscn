@@ -12,6 +12,14 @@ script = ExtResource("1_cuxo4")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.408)
 script = ExtResource("2_vfiuo")
 
+[node name="ProgressBar" type="ProgressBar" parent="Camera3D"]
+offset_left = 485.0
+offset_top = 240.0
+offset_right = 614.0
+offset_bottom = 267.0
+value = 50.0
+script = ExtResource("4_2haqg")
+
 [node name="Marker3D" type="Marker3D" parent="."]
 
 [node name="Enemy" parent="Marker3D" instance=ExtResource("1_dlmcl")]
@@ -29,12 +37,3 @@ offset_top = 512.0
 offset_right = 1068.0
 offset_bottom = 557.0
 text = "god damn"
-
-[node name="ProgressBar" type="ProgressBar" parent="Control"]
-layout_mode = 0
-offset_left = 485.0
-offset_top = 240.0
-offset_right = 614.0
-offset_bottom = 267.0
-value = 50.0
-script = ExtResource("4_2haqg")
