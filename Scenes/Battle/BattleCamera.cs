@@ -23,7 +23,8 @@ public partial class BattleCamera : Camera3D
 		//GlobalPosition = new Vector3((float)Math.Sin(progress) * 3, 0, (float)Math.Cos(progress) * 3);
 		GlobalPosition = new Vector3((float)Math.Sin(progress) * 2 + 1, 0, (float)Math.Sin(progress)+2);
 
-		healthBar.Position = UnprojectPosition(enemy.GlobalPosition);
-		//LookAt(Vector3.Zero);
+		Vector2 barPos = UnprojectPosition(enemy.GlobalPosition);
+		healthBar.Position = barPos - new Vector2(50,80);
+		//LookAt(Vector3.Zero)
 	}
 }
