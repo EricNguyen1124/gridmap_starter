@@ -22,7 +22,7 @@ public partial class Battle : Node3D
 		var player = new Combatant
 		{
 			CombatantName = "jim",
-			Speed = 5.0f,
+			Speed = 6.0f,
 			Health = 5.0f,
 			Mana = 4.0f,
 			Attack = 1.0f,
@@ -55,7 +55,7 @@ public partial class Battle : Node3D
 					// Take Player Turn (only if message received from UI)
 					if (Input.IsActionJustPressed("ui_left"))
 					{
-						var enemy = combatants.First(c => c.CombatantName == "enemy");
+						var enemy = combatants.First(c => c.CombatantName == "Blob");
 
 						currentState = BATTLE_STATE.TURN_IN_PROGRESS;
 						currentCombatant.TakeTurn(enemy, COMBATANT_COMMANDS.ATTACK);
@@ -84,11 +84,6 @@ public partial class Battle : Node3D
 			case BATTLE_STATE.TURN_IN_PROGRESS:
 			default:
 			break;
-		}
-
-		if (!combatants.Any(c => !c.PlayerControlled && c.Health > 0))
-		{
-			GD.Print("Battle Done!");
 		}
 	}
 
