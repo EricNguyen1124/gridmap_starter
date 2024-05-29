@@ -11,12 +11,14 @@ namespace Classes.Combatant
 
     public class Combatant: ICombatant
     {
+        public int Id { get; set; }
         public string CombatantName { get; set; }
         public float Health { get; set; }
         public float Mana { get; set; }
         public float Speed { get; set; }
         public float Attack { get; set; }
         public bool PlayerControlled { get; set; }
+        public int Level { get; set;}
         public List<Skill> Skills { get; set; }
     }
 
@@ -24,19 +26,5 @@ namespace Classes.Combatant
     {
         public string Name;
         public Action<ICombatant, ICombatant> Action;
-    }
-
-    public static class SkillList
-    {
-        public static List<Skill> AllSkills = new()
-        {
-            new Skill {
-                Name = "Big Strike",
-                Action = (self, target) => {
-                    target.Health -= self.Attack * 2;
-                    self.Mana -= 10;
-                }
-            }
-        };
     }
 }

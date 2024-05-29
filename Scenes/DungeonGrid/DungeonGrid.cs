@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Scenes.Room;
 using System.Linq;
 using Utilities.DebugDraw;
+using Classes.Combatant;
+using Classes.Database;
 
 public partial class DungeonGrid : GridMap
 {
@@ -19,6 +21,21 @@ public partial class DungeonGrid : GridMap
     public override void _Ready()
     {
         testMat = GD.Load<Material>("res://assets/test.material");
+
+		var player = new Combatant
+		{
+			CombatantName = "jim",
+			Speed = 5.0f,
+			Health = 5.0f,
+			Mana = 4.0f,
+			Attack = 1.0f,
+			PlayerControlled = true,
+			Skills = new() {
+				Database.SkillLibrary[SKILLS.STRIKE]
+			}
+		};
+
+		Party.Members.Add(player);
     }
 
     public override void _Process(double delta)

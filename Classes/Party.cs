@@ -3,8 +3,8 @@ using Interfaces;
 using System;
 using System.Collections.Generic;
 
-public partial class Party : Node
+public static class Party
 {
-    List<ICombatant> Members;
+    public static List<ICombatant> Members = new List<ICombatant>();
     //List<Item> Inventory;
 }

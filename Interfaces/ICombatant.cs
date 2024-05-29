@@ -6,12 +6,14 @@ using Classes.Combatant;
 namespace Interfaces {
     public interface ICombatant 
     {
+        int Id { get; set; }
         string CombatantName { get; set; }
         float Health { get; set; }
         float Mana { get; set; }
         float Speed { get; set; }
         float Attack { get; set; }
         bool PlayerControlled { get; set; }
+        public int Level { get; set;}
         List<Skill> Skills { get; set;}
 
         // Probably need to make this a list of targets instead

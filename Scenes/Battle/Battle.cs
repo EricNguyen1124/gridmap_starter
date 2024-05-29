@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Classes.Combatant;
 using Scenes.Enemy;
+using Classes.Database;
 
 public partial class Battle : Node3D
 {
@@ -27,27 +28,20 @@ public partial class Battle : Node3D
 			Attack = 1.0f,
 			PlayerControlled = true,
 			Skills = new() {
-				SkillList.AllSkills.First()
+				Database.SkillLibrary[SKILLS.STRIKE]
 			}
 		};
 
-		var enemy = new Enemy
-		{
-			CombatantName = "enemy",
-			Speed = 8.0f,
-			Health = 3.0f,
-			Mana = 4.0f,
-			Attack = 1.0f,
-			PlayerControlled = false,
-			Skills = new() {
-				SkillList.AllSkills.First()
-			},
-			Behavior = ENEMY_BEHAVIOR.NORMAL
-		};
-
-		combatants.Add(player);
-		combatants.Add(enemy);
+		Party.Members.Add(player);
+		combatants.AddRange(Party.Members);
+		combatants.AddRange(SpawnEnemies());
 		
+		int id = 0;
+		foreach (var combatant in combatants)
+		{
+			combatant.Id = id++;
+		}
+
 		currentCombatant = combatants.MaxBy(c => c.Speed);
 	}
 
@@ -109,5 +103,13 @@ public partial class Battle : Node3D
 		}
 
 		return nextCombatant;
-	}	
+	}
+
+	private List<Enemy> SpawnEnemies()
+	{
+		return new List<Enemy>() {
+			Database.EnemyLibrary[ENEMIES.BLOB],
+			Database.EnemyLibrary[ENEMIES.SKELETON]	
+		};
+	}
 }
