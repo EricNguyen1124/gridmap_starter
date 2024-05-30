@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Classes.Combatant;
+using Godot;
 using Scenes.Enemy;
 
 namespace Classes.Database
@@ -34,6 +36,8 @@ namespace Classes.Database
             }
         };
 
+        
+
         public static Dictionary<ENEMIES, Enemy> EnemyLibrary = new()
         {
             {
@@ -48,7 +52,8 @@ namespace Classes.Database
                     Skills = new List<Skill>() {
                         SkillLibrary[SKILLS.STRIKE]
                     },
-                    Behavior = ENEMY_BEHAVIOR.NORMAL
+                    Behavior = ENEMY_BEHAVIOR.NORMAL,
+                    SpriteTexture = LoadEnemySprite("blob.png")
                 }
             },
             {
@@ -63,9 +68,16 @@ namespace Classes.Database
                     Skills = new List<Skill>() {
                         SkillLibrary[SKILLS.STRIKE]
                     },
-                    Behavior = ENEMY_BEHAVIOR.NORMAL
+                    Behavior = ENEMY_BEHAVIOR.NORMAL,
+                    SpriteTexture = LoadEnemySprite("skeleton.png")
                 }
             }
         };
+
+        private static Texture2D LoadEnemySprite(string fileName)
+        {
+            string enemySpritePath = "res://assets/Enemies/";
+            return GD.Load<Texture2D>(enemySpritePath + fileName);
+        }
     }
 }

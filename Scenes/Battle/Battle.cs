@@ -16,36 +16,55 @@ public partial class Battle : Node3D
 	enum BATTLE_STATE {TURN_IN_PROGRESS, TURN_ENDED, TURN_STARTED}
 	private BATTLE_STATE currentState = BATTLE_STATE.TURN_STARTED;
 	public override void _Ready()
-	{
-		battleUI = GetNode<Control>("Control");
-		battleUI.Visible = false;
-		var player = new Combatant
-		{
-			CombatantName = "jim",
-			Speed = 6.0f,
-			Health = 5.0f,
-			Mana = 4.0f,
-			Attack = 1.0f,
-			PlayerControlled = true,
-			Skills = new() {
-				Database.SkillLibrary[SKILLS.STRIKE]
-			}
-		};
+    {
+        battleUI = GetNode<Control>("Control");
+        battleUI.Visible = false;
+        var player = new Combatant
+        {
+            CombatantName = "jim",
+            Speed = 6.0f,
+            Health = 5.0f,
+            Mana = 4.0f,
+            Attack = 1.0f,
+            PlayerControlled = true,
+            Skills = new() {
+                Database.SkillLibrary[SKILLS.STRIKE]
+            }
+        };
 
-		Party.Members.Add(player);
-		combatants.AddRange(Party.Members);
-		combatants.AddRange(SpawnEnemies());
-		
-		int id = 0;
-		foreach (var combatant in combatants)
-		{
-			combatant.Id = id++;
-		}
+        Party.Members.Add(player);
+        combatants.AddRange(Party.Members);
 
-		currentCombatant = combatants.MaxBy(c => c.Speed);
-	}
+        var enemies = ChooseEnemiesFromLibrary();
+        combatants.AddRange(enemies);
+        SpawnEnemies(enemies);
 
-	public override void _Process(double delta)
+        int id = 0;
+        foreach (var combatant in combatants)
+        {
+            combatant.Id = id++;
+        }
+
+        currentCombatant = combatants.MaxBy(c => c.Speed);
+    }
+
+    private void SpawnEnemies(List<Enemy> enemies)
+    {
+        var spacing = 5.8f / (float)(enemies.Count + 1);
+        var spawnPosition = -2.8f;
+
+        foreach (Enemy enemy in enemies)
+        {
+            var enemyScene = GD.Load<PackedScene>("res://Scenes/Enemy/Enemy.tscn");
+            var enemyInstance = (Enemy)enemyScene.Instantiate();
+            enemyInstance.SetEnemyProperties(enemy);
+            enemyInstance.Position = new Vector3(spawnPosition + spacing, 0, 0);
+            AddChild(enemyInstance);
+            spawnPosition += spacing;
+        }
+    }
+
+    public override void _Process(double delta)
 	{
 		switch (currentState)
 		{
@@ -100,11 +119,12 @@ public partial class Battle : Node3D
 		return nextCombatant;
 	}
 
-	private List<Enemy> SpawnEnemies()
+	private List<Enemy> ChooseEnemiesFromLibrary()
 	{
 		return new List<Enemy>() {
 			Database.EnemyLibrary[ENEMIES.BLOB],
-			Database.EnemyLibrary[ENEMIES.SKELETON]	
+			Database.EnemyLibrary[ENEMIES.BLOB],
+			Database.EnemyLibrary[ENEMIES.SKELETON],
 		};
 	}
 }

@@ -1,10 +1,11 @@
 [gd_scene load_steps=3 format=3 uid="uid://bpe86i6grh3vu"]
 
-[ext_resource type="Texture2D" uid="uid://c5sy5mtcc6a2b" path="res://icon.png" id="1_41ygn"]
 [ext_resource type="Script" path="res://Scenes/Enemy/Enemy.cs" id="1_ruvcm"]
+[ext_resource type="Texture2D" uid="uid://dl4j2ww5g61ic" path="res://assets/Enemies/blob.png" id="2_diems"]
 
 [node name="Enemy" type="Node3D"]
 script = ExtResource("1_ruvcm")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
-texture = ExtResource("1_41ygn")
+transform = Transform3D(0.15, 0, 0, 0, 0.15, 0, 0, 0, 0.15, 0, 0, 0)
+texture = ExtResource("2_diems")

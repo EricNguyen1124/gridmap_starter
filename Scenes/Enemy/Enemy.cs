@@ -23,14 +23,32 @@ namespace Scenes.Enemy
         public List<Skill> Skills { get; set; }
         public ENEMY_BEHAVIOR Behavior { get; set; } = ENEMY_BEHAVIOR.NORMAL;
 
+        public Texture2D SpriteTexture { get; set; }
+        private Sprite3D Sprite { get; set; }
+
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
+            Sprite = GetNode<Sprite3D>("Sprite3D");
+            Sprite.Texture = SpriteTexture;
         }
 
         // Called every frame. 'delta' is the elapsed time since the previous frame.
         public override void _Process(double delta)
         {
+        }
+
+        public void SetEnemyProperties(Enemy enemy)
+        {
+            CombatantName = enemy.CombatantName;
+            Health = enemy.Health;
+            Mana = enemy.Mana;
+            Speed = enemy.Speed;
+            Attack = enemy.Attack;
+            Level = enemy.Level;
+            Skills = enemy.Skills;
+            Behavior = enemy.Behavior;
+            SpriteTexture = enemy.SpriteTexture;
         }
         
         private Func<List<ICombatant>, (ICombatant, COMBATANT_COMMANDS, string)> GetBehavior(ENEMY_BEHAVIOR behavior) 

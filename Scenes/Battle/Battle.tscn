@@ -21,8 +21,10 @@ value = 50.0
 script = ExtResource("4_2haqg")
 
 [node name="Marker3D" type="Marker3D" parent="."]
+visible = false
 
 [node name="Enemy" parent="Marker3D" instance=ExtResource("1_dlmcl")]
+visible = false
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
