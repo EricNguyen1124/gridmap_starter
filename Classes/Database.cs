@@ -44,7 +44,7 @@ namespace Classes.Database
                 ENEMIES.BLOB, 
                 new Enemy {
                     CombatantName = "Blob",
-                    Health = 7,
+                    MaxHealth = 7,
                     Mana = 3,
                     Speed = 5,
                     Attack = 2,
@@ -60,7 +60,7 @@ namespace Classes.Database
                 ENEMIES.SKELETON, 
                 new Enemy {
                     CombatantName = "Skeleton",
-                    Health = 5,
+                    MaxHealth = 5,
                     Mana = 2,
                     Speed = 8,
                     Attack = 1,

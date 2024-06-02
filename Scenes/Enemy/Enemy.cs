@@ -14,6 +14,7 @@ namespace Scenes.Enemy
         public Func<List<ICombatant>, (ICombatant, COMBATANT_COMMANDS, string)> MakeTurnDecision { get { return GetBehavior(Behavior); } }
         public int Id { get; set; }
         public string CombatantName { get; set; }
+        public float MaxHealth { get; set; }
         public float Health { get; set; }
         public float Mana { get; set; }
         public float Speed { get; set; }
@@ -41,7 +42,8 @@ namespace Scenes.Enemy
         public void SetEnemyProperties(Enemy enemy)
         {
             CombatantName = enemy.CombatantName;
-            Health = enemy.Health;
+            MaxHealth = enemy.MaxHealth;
+            Health = enemy.MaxHealth;
             Mana = enemy.Mana;
             Speed = enemy.Speed;
             Attack = enemy.Attack;

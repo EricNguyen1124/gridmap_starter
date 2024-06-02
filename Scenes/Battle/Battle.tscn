@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bpe86i6grh3vu" path="res://Scenes/Enemy/Enemy.tscn" id="1_dlmcl"]
 [ext_resource type="Script" path="res://Scenes/Battle/BattleCamera.cs" id="2_vfiuo"]
 [ext_resource type="Script" path="res://Scenes/Battle/HealthBar.cs" id="4_2haqg"]
-[ext_resource type="Texture2D" uid="uid://c5sy5mtcc6a2b" path="res://icon.png" id="5_cbgmo"]
+[ext_resource type="PackedScene" uid="uid://bweylganf0u34" path="res://Scenes/UI/PartyMemberUI.tscn" id="5_7x6ru"]
 
 [node name="Battle" type="Node3D"]
 script = ExtResource("1_cuxo4")
@@ -41,39 +41,18 @@ offset_bottom = 606.0
 text = "god damn"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-anchors_preset = -1
+anchors_preset = 6
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -208.0
-offset_top = -239.0
-offset_right = -22.0
-offset_bottom = 240.0
+offset_left = -240.0
+offset_top = -233.0
+offset_right = -31.0
+offset_bottom = 235.0
 grow_horizontal = 0
 grow_vertical = 2
 
-[node name="VSplitContainer" type="VSplitContainer" parent="VBoxContainer"]
+[node name="PanelContainer" parent="VBoxContainer" instance=ExtResource("5_7x6ru")]
 layout_mode = 2
-
-[node name="HSplitContainer" type="HSplitContainer" parent="VBoxContainer/VSplitContainer"]
-layout_mode = 2
-split_offset = 50
-
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/VSplitContainer/HSplitContainer"]
-layout_mode = 2
-texture = ExtResource("5_cbgmo")
-
-[node name="VSplitContainer" type="VSplitContainer" parent="VBoxContainer/VSplitContainer/HSplitContainer"]
-layout_mode = 2
-
-[node name="Health" type="ProgressBar" parent="VBoxContainer/VSplitContainer/HSplitContainer/VSplitContainer"]
-layout_mode = 2
-
-[node name="Mana" type="ProgressBar" parent="VBoxContainer/VSplitContainer/HSplitContainer/VSplitContainer"]
-layout_mode = 2
-
-[node name="ClassName" type="Label" parent="VBoxContainer/VSplitContainer"]
-layout_mode = 2
-text = "CLASS NAME"
-horizontal_alignment = 1
+size_flags_vertical = 0

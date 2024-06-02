@@ -8,6 +8,7 @@ namespace Interfaces {
     {
         int Id { get; set; }
         string CombatantName { get; set; }
+        float MaxHealth { get; set; }
         float Health { get; set; }
         float Mana { get; set; }
         float Speed { get; set; }
