@@ -1,15 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://j5t12uvg63fx"]
+[gd_scene load_steps=6 format=3 uid="uid://j5t12uvg63fx"]
 
 [ext_resource type="Script" path="res://Scenes/Battle/Battle.cs" id="1_cuxo4"]
 [ext_resource type="PackedScene" uid="uid://bpe86i6grh3vu" path="res://Scenes/Enemy/Enemy.tscn" id="1_dlmcl"]
 [ext_resource type="Script" path="res://Scenes/Battle/BattleCamera.cs" id="2_vfiuo"]
 [ext_resource type="Script" path="res://Scenes/Battle/HealthBar.cs" id="4_2haqg"]
+[ext_resource type="Texture2D" uid="uid://c5sy5mtcc6a2b" path="res://icon.png" id="5_lhyee"]
 
 [node name="Battle" type="Node3D"]
 script = ExtResource("1_cuxo4")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.408)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.457993, 0, 2.38124)
 script = ExtResource("2_vfiuo")
 
 [node name="ProgressBar" type="ProgressBar" parent="Camera3D"]
@@ -21,7 +22,7 @@ value = 50.0
 script = ExtResource("4_2haqg")
 
 [node name="Marker3D" type="Marker3D" parent="."]
-visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.231955, 0, 0.512988)
 
 [node name="Enemy" parent="Marker3D" instance=ExtResource("1_dlmcl")]
 
@@ -37,3 +38,11 @@ offset_right = -31.0
 offset_bottom = 235.0
 grow_horizontal = 0
 grow_vertical = 2
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.01062, 0, 1.40917)
+texture = ExtResource("5_lhyee")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625832, -0.544736, 0.713732)
+size = Vector3(6.14996, 0.185547, 5.16846)

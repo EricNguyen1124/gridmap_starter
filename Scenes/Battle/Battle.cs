@@ -38,8 +38,8 @@ public partial class Battle : Node3D
 		{
 			var partyMemberUI = GD.Load<PackedScene>("res://Scenes/UI/PartyMemberUI.tscn");
             var uiInstance = (PartyMemberUI)partyMemberUI.Instantiate();
-			uiInstance.Initialize(partyMember);
 			battleUI.AddChild(uiInstance);
+			uiInstance.Initialize(partyMember);
 		}
 
         combatants.AddRange(Party.Members);
