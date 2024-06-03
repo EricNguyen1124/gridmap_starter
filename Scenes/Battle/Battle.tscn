@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://j5t12uvg63fx"]
+[gd_scene load_steps=5 format=3 uid="uid://j5t12uvg63fx"]
 
 [ext_resource type="Script" path="res://Scenes/Battle/Battle.cs" id="1_cuxo4"]
 [ext_resource type="PackedScene" uid="uid://bpe86i6grh3vu" path="res://Scenes/Enemy/Enemy.tscn" id="1_dlmcl"]
 [ext_resource type="Script" path="res://Scenes/Battle/BattleCamera.cs" id="2_vfiuo"]
 [ext_resource type="Script" path="res://Scenes/Battle/HealthBar.cs" id="4_2haqg"]
-[ext_resource type="PackedScene" uid="uid://bweylganf0u34" path="res://Scenes/UI/PartyMemberUI.tscn" id="5_7x6ru"]
 
 [node name="Battle" type="Node3D"]
 script = ExtResource("1_cuxo4")
@@ -26,21 +25,7 @@ visible = false
 
 [node name="Enemy" parent="Marker3D" instance=ExtResource("1_dlmcl")]
 
-[node name="Control" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Button" type="Button" parent="Control"]
-layout_mode = 0
-offset_left = 620.0
-offset_top = 561.0
-offset_right = 740.0
-offset_bottom = 606.0
-text = "god damn"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="BattleUI" type="VBoxContainer" parent="."]
 anchors_preset = 6
 anchor_left = 1.0
 anchor_top = 0.5
@@ -52,7 +37,3 @@ offset_right = -31.0
 offset_bottom = 235.0
 grow_horizontal = 0
 grow_vertical = 2
-
-[node name="PanelContainer" parent="VBoxContainer" instance=ExtResource("5_7x6ru")]
-layout_mode = 2
-size_flags_vertical = 0

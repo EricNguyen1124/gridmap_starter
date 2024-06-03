@@ -16,6 +16,7 @@ namespace Scenes.Enemy
         public string CombatantName { get; set; }
         public float MaxHealth { get; set; }
         public float Health { get; set; }
+        public float MaxMana { get; set; }
         public float Mana { get; set; }
         public float Speed { get; set; }
         public float Attack { get; set; }
@@ -44,7 +45,8 @@ namespace Scenes.Enemy
             CombatantName = enemy.CombatantName;
             MaxHealth = enemy.MaxHealth;
             Health = enemy.MaxHealth;
-            Mana = enemy.Mana;
+            MaxMana = enemy.MaxMana;
+            Mana = enemy.MaxMana;
             Speed = enemy.Speed;
             Attack = enemy.Attack;
             Level = enemy.Level;

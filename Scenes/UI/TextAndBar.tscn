@@ -1,12 +1,17 @@
-[gd_scene format=3 uid="uid://3m020hsjksnn"]
+[gd_scene load_steps=2 format=3 uid="uid://3m020hsjksnn"]
+
+[ext_resource type="Script" path="res://Scenes/UI/TextAndBar.cs" id="1_kxt30"]
 
 [node name="VBoxContainer" type="VBoxContainer"]
+offset_right = 112.0
+offset_bottom = 31.0
+script = ExtResource("1_kxt30")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
 text = "10 HP"
 
-[node name="Health" type="ProgressBar" parent="."]
+[node name="ProgressBar" type="ProgressBar" parent="."]
 layout_mode = 2
 value = 50.0
 show_percentage = false

@@ -9,22 +9,22 @@ using Classes.Database;
 
 public partial class Battle : Node3D
 {
-	private Control battleUI;
 	private List<ICombatant> combatants = new();
 	private ICombatant currentCombatant;
+	private VBoxContainer battleUI;
 
 	enum BATTLE_STATE {TURN_IN_PROGRESS, TURN_ENDED, TURN_STARTED}
 	private BATTLE_STATE currentState = BATTLE_STATE.TURN_STARTED;
 	public override void _Ready()
     {
-        battleUI = GetNode<Control>("Control");
-        battleUI.Visible = false;
+        battleUI = GetNode<VBoxContainer>("BattleUI");
+
         var player = new Combatant
         {
             CombatantName = "jim",
             Speed = 6.0f,
-            Health = 5.0f,
-            Mana = 4.0f,
+            MaxHealth = 5.0f,
+            MaxMana = 4.0f,
             Attack = 1.0f,
             PlayerControlled = true,
             Skills = new() {
@@ -33,6 +33,15 @@ public partial class Battle : Node3D
         };
 
         Party.Members.Add(player);
+
+		foreach (var partyMember in Party.Members)
+		{
+			var partyMemberUI = GD.Load<PackedScene>("res://Scenes/UI/PartyMemberUI.tscn");
+            var uiInstance = (PartyMemberUI)partyMemberUI.Instantiate();
+			uiInstance.Initialize(partyMember);
+			battleUI.AddChild(uiInstance);
+		}
+
         combatants.AddRange(Party.Members);
 
         var enemies = ChooseEnemiesFromLibrary();
@@ -96,7 +105,6 @@ public partial class Battle : Node3D
 
 			case BATTLE_STATE.TURN_ENDED:
 				currentCombatant = FindNextCombatant();
-				battleUI.Visible = currentCombatant.PlayerControlled;
 				currentState = BATTLE_STATE.TURN_STARTED;
 			break;
 

@@ -24,10 +24,10 @@ texture = ExtResource("1_mklhb")
 [node name="Bars" type="VSplitContainer" parent="VSplitContainer/HSplitContainer"]
 layout_mode = 2
 
-[node name="HPTextBar" parent="VSplitContainer/HSplitContainer/Bars" instance=ExtResource("3_crisi")]
+[node name="HP" parent="VSplitContainer/HSplitContainer/Bars" instance=ExtResource("3_crisi")]
 layout_mode = 2
 
-[node name="MPTextBar" parent="VSplitContainer/HSplitContainer/Bars" instance=ExtResource("3_crisi")]
+[node name="MP" parent="VSplitContainer/HSplitContainer/Bars" instance=ExtResource("3_crisi")]
 layout_mode = 2
 
 [node name="Label" type="Label" parent="VSplitContainer"]

@@ -13,7 +13,9 @@ namespace Classes.Combatant
     {
         public int Id { get; set; }
         public string CombatantName { get; set; }
+        public float MaxHealth { get; set; }
         public float Health { get; set; }
+        public float MaxMana { get; set; }
         public float Mana { get; set; }
         public float Speed { get; set; }
         public float Attack { get; set; }

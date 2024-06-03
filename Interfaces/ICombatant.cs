@@ -10,6 +10,7 @@ namespace Interfaces {
         string CombatantName { get; set; }
         float MaxHealth { get; set; }
         float Health { get; set; }
+        float MaxMana { get; set; }
         float Mana { get; set; }
         float Speed { get; set; }
         float Attack { get; set; }

@@ -26,8 +26,8 @@ public partial class DungeonGrid : GridMap
 		{
 			CombatantName = "jim",
 			Speed = 5.0f,
-			Health = 5.0f,
-			Mana = 4.0f,
+			MaxHealth = 5.0f,
+			MaxMana = 4.0f,
 			Attack = 1.0f,
 			PlayerControlled = true,
 			Skills = new() {
