@@ -95,7 +95,7 @@ public partial class Battle : Node3D
 					// Take AI Turn
 
 					var enemy = (Enemy)currentCombatant;
-					(ICombatant target, COMBATANT_COMMANDS command, string specifier) = enemy.MakeTurnDecision(combatants);
+					(ICombatant target, COMBATANT_COMMANDS command, string specifier) = enemy.NewMakeTurnDecision(combatants);
 
 					currentState = BATTLE_STATE.TURN_IN_PROGRESS;
 					currentCombatant.TakeTurn(target, command, specifier);

@@ -22,9 +22,10 @@ value = 50.0
 script = ExtResource("4_2haqg")
 
 [node name="Marker3D" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.231955, 0, 0.512988)
+visible = false
 
 [node name="Enemy" parent="Marker3D" instance=ExtResource("1_dlmcl")]
+visible = false
 
 [node name="BattleUI" type="VBoxContainer" parent="."]
 anchors_preset = 6
@@ -44,5 +45,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.01062, 0, 1.40917)
 texture = ExtResource("5_lhyee")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625832, -0.544736, 0.713732)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625832, -0.479142, 0.713732)
 size = Vector3(6.14996, 0.185547, 5.16846)

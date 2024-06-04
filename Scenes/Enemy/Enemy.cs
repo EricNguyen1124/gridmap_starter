@@ -4,14 +4,14 @@ using System;
 using System.Collections.Generic;
 using Classes.Combatant;
 using System.Linq;
+using Classes.Database;
 
 namespace Scenes.Enemy
 {
     public enum ENEMY_BEHAVIOR { NORMAL }
 
     public partial class Enemy : Node3D, ICombatant
-    {
-        public Func<List<ICombatant>, (ICombatant, COMBATANT_COMMANDS, string)> MakeTurnDecision { get { return GetBehavior(Behavior); } }
+    {        
         public int Id { get; set; }
         public string CombatantName { get; set; }
         public float MaxHealth { get; set; }
@@ -39,6 +39,11 @@ namespace Scenes.Enemy
         public override void _Process(double delta)
         {
         }
+
+        public (ICombatant, COMBATANT_COMMANDS, string) NewMakeTurnDecision(List<ICombatant> combatants)
+        { 
+            return Database.EnemyBehaviorLibrary[Behavior](this, combatants); 
+        } 
 
         public void SetEnemyProperties(Enemy enemy)
         {

@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Classes.Combatant;
 using Godot;
+using Interfaces;
 using Scenes.Enemy;
 
 namespace Classes.Database
@@ -70,6 +72,29 @@ namespace Classes.Database
                     },
                     Behavior = ENEMY_BEHAVIOR.NORMAL,
                     SpriteTexture = LoadEnemySprite("skeleton.png")
+                }
+            }
+        };
+
+        public static Dictionary<ENEMY_BEHAVIOR, Func<ICombatant, List<ICombatant>, (ICombatant, COMBATANT_COMMANDS, string)>> EnemyBehaviorLibrary = new()
+        {
+            {
+                ENEMY_BEHAVIOR.NORMAL,
+                (self, combatants) => {
+                    var random = new Random();
+
+                    var viableTargets = combatants.Where(c => c.Id != self.Id && c.PlayerControlled).ToList();
+                    var index = random.Next(viableTargets.Count);
+                    var randomTarget = viableTargets[index];
+
+                    if (random.NextDouble() < 0.2f)
+                    {
+                        return (randomTarget, COMBATANT_COMMANDS.SKILL, "Strike");
+                    }
+                    else
+                    {
+                        return (randomTarget, COMBATANT_COMMANDS.ATTACK, null);
+                    }
                 }
             }
         };
