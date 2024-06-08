@@ -38,8 +38,6 @@ namespace Classes.Database
             }
         };
 
-        
-
         public static Dictionary<ENEMIES, Enemy> EnemyLibrary = new()
         {
             {

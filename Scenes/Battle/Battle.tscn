@@ -10,7 +10,7 @@
 script = ExtResource("1_cuxo4")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.457993, 0, 2.38124)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0285445, 0, 2.38124)
 script = ExtResource("2_vfiuo")
 
 [node name="ProgressBar" type="ProgressBar" parent="Camera3D"]
@@ -25,7 +25,6 @@ script = ExtResource("4_2haqg")
 visible = false
 
 [node name="Enemy" parent="Marker3D" instance=ExtResource("1_dlmcl")]
-visible = false
 
 [node name="BattleUI" type="VBoxContainer" parent="."]
 anchors_preset = 6
@@ -47,3 +46,36 @@ texture = ExtResource("5_lhyee")
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625832, -0.479142, 0.713732)
 size = Vector3(6.14996, 0.185547, 5.16846)
+
+[node name="Targeter" type="Sprite3D" parent="."]
+transform = Transform3D(0.15, 0, 0, 0, 0.15, 0, 0, 0, 0.15, 0, 0, 1.23922)
+texture = ExtResource("5_lhyee")
+
+[node name="PlayerUI" type="PanelContainer" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 59.0
+offset_top = -235.0
+offset_right = 181.0
+offset_bottom = -99.0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PlayerUI"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="PlayerUI/VBoxContainer"]
+layout_mode = 2
+text = "Attack"
+
+[node name="MenuButton" type="MenuButton" parent="PlayerUI/VBoxContainer"]
+layout_mode = 2
+text = "Skills"
+
+[node name="Button3" type="Button" parent="PlayerUI/VBoxContainer"]
+layout_mode = 2
+text = "Items"
+
+[node name="Button4" type="Button" parent="PlayerUI/VBoxContainer"]
+layout_mode = 2
+text = "Guard"

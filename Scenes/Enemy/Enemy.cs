@@ -21,6 +21,7 @@ namespace Scenes.Enemy
         public float Speed { get; set; }
         public float Attack { get; set; }
         public bool PlayerControlled { get; set; } = false;
+        public bool Fainted { get; set; } = false;
         public int Level { get; set;}
         public List<Skill> Skills { get; set; }
         public ENEMY_BEHAVIOR Behavior { get; set; } = ENEMY_BEHAVIOR.NORMAL;
@@ -40,7 +41,7 @@ namespace Scenes.Enemy
         {
         }
 
-        public (ICombatant, COMBATANT_COMMANDS, string) NewMakeTurnDecision(List<ICombatant> combatants)
+        public (ICombatant, COMBATANT_COMMANDS, string) MakeTurnDecision(List<ICombatant> combatants)
         { 
             return Database.EnemyBehaviorLibrary[Behavior](this, combatants); 
         } 

@@ -20,6 +20,7 @@ namespace Classes.Combatant
         public float Speed { get; set; }
         public float Attack { get; set; }
         public bool PlayerControlled { get; set; }
+        public bool Fainted { get; set; } = false;
         public int Level { get; set;}
         public List<Skill> Skills { get; set; }
     }

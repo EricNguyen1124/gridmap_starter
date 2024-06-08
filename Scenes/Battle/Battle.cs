@@ -12,18 +12,22 @@ public partial class Battle : Node3D
 	private List<ICombatant> combatants = new();
 	private ICombatant currentCombatant;
 	private VBoxContainer battleUI;
+	private Sprite3D targeter;
 
 	enum BATTLE_STATE {TURN_IN_PROGRESS, TURN_ENDED, TURN_STARTED}
 	private BATTLE_STATE currentState = BATTLE_STATE.TURN_STARTED;
+	
 	public override void _Ready()
     {
         battleUI = GetNode<VBoxContainer>("BattleUI");
+		targeter = GetNode<Sprite3D>("Targeter");
+		targeter.Visible = false;
 
         var player = new Combatant
         {
             CombatantName = "jim",
             Speed = 6.0f,
-            MaxHealth = 5.0f,
+            MaxHealth = 20.0f,
             MaxMana = 4.0f,
             Attack = 1.0f,
             PlayerControlled = true,
@@ -51,6 +55,7 @@ public partial class Battle : Node3D
         int id = 0;
         foreach (var combatant in combatants)
         {
+			combatant.ResetHealth();
             combatant.Id = id++;
         }
 
@@ -93,9 +98,8 @@ public partial class Battle : Node3D
 				else
 				{
 					// Take AI Turn
-
 					var enemy = (Enemy)currentCombatant;
-					(ICombatant target, COMBATANT_COMMANDS command, string specifier) = enemy.NewMakeTurnDecision(combatants);
+					(ICombatant target, COMBATANT_COMMANDS command, string specifier) = enemy.MakeTurnDecision(combatants);
 
 					currentState = BATTLE_STATE.TURN_IN_PROGRESS;
 					currentCombatant.TakeTurn(target, command, specifier);
@@ -105,6 +109,8 @@ public partial class Battle : Node3D
 
 			case BATTLE_STATE.TURN_ENDED:
 				currentCombatant = FindNextCombatant();
+				targeter.Visible = currentCombatant.PlayerControlled;
+				List<ICombatant> enemies = combatants.Where(e => !e.PlayerControlled).ToList();
 				currentState = BATTLE_STATE.TURN_STARTED;
 			break;
 
