@@ -11,7 +11,8 @@ namespace Classes.Database
 {
     public enum SKILLS 
     { 
-        STRIKE, 
+        STRIKE,
+        FIREBALL,
         COUNT 
     }
 
@@ -31,9 +32,19 @@ namespace Classes.Database
                 new Skill {
                     Name = "Strike",
                     Action = (self, target) => {
-                        target.Health -= self.Attack * 2;
-                        self.Mana -= 10;
-                    }
+                        target.Health -= (float)Math.Round(self.Attack * 1.5f);
+                    },
+                    Cost = 2.0f
+                }
+            },
+            {
+                SKILLS.FIREBALL, 
+                new Skill {
+                    Name = "Fireball",
+                    Action = (self, target) => {
+                        target.Health -= 5 + (self.Level * 3);
+                    },
+                    Cost = 5.0f
                 }
             }
         };
@@ -45,7 +56,7 @@ namespace Classes.Database
                 new Enemy {
                     CombatantName = "Blob",
                     MaxHealth = 7,
-                    Mana = 3,
+                    Mana = 8,
                     Speed = 5,
                     Attack = 2,
                     Level = 1,

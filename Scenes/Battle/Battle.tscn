@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://j5t12uvg63fx"]
+[gd_scene load_steps=7 format=3 uid="uid://j5t12uvg63fx"]
 
 [ext_resource type="Script" path="res://Scenes/Battle/Battle.cs" id="1_cuxo4"]
 [ext_resource type="PackedScene" uid="uid://bpe86i6grh3vu" path="res://Scenes/Enemy/Enemy.tscn" id="1_dlmcl"]
 [ext_resource type="Script" path="res://Scenes/Battle/BattleCamera.cs" id="2_vfiuo"]
 [ext_resource type="Script" path="res://Scenes/Battle/HealthBar.cs" id="4_2haqg"]
 [ext_resource type="Texture2D" uid="uid://c5sy5mtcc6a2b" path="res://icon.png" id="5_lhyee"]
+[ext_resource type="Script" path="res://Scenes/Battle/PlayerUI.cs" id="6_dttja"]
 
 [node name="Battle" type="Node3D"]
 script = ExtResource("1_cuxo4")
@@ -47,10 +48,6 @@ texture = ExtResource("5_lhyee")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625832, -0.479142, 0.713732)
 size = Vector3(6.14996, 0.185547, 5.16846)
 
-[node name="Targeter" type="Sprite3D" parent="."]
-transform = Transform3D(0.15, 0, 0, 0, 0.15, 0, 0, 0, 0.15, 0, 0, 1.23922)
-texture = ExtResource("5_lhyee")
-
 [node name="PlayerUI" type="PanelContainer" parent="."]
 anchors_preset = 2
 anchor_top = 1.0
@@ -60,22 +57,36 @@ offset_top = -235.0
 offset_right = 181.0
 offset_bottom = -99.0
 grow_vertical = 0
+script = ExtResource("6_dttja")
+
+[node name="Targeter" type="Sprite3D" parent="PlayerUI"]
+transform = Transform3D(0.15, 0, 0, 0, 0.15, 0, 0, 0, 0.15, 0, 0, 1.23922)
+texture = ExtResource("5_lhyee")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PlayerUI"]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="PlayerUI/VBoxContainer"]
+[node name="AttackButton" type="Button" parent="PlayerUI/VBoxContainer"]
 layout_mode = 2
 text = "Attack"
 
-[node name="MenuButton" type="MenuButton" parent="PlayerUI/VBoxContainer"]
+[node name="SkillsMenu" type="MenuButton" parent="PlayerUI/VBoxContainer"]
 layout_mode = 2
 text = "Skills"
+flat = false
+item_count = 3
+popup/item_0/text = "Strike"
+popup/item_0/id = 0
+popup/item_1/text = "Fireball"
+popup/item_1/id = 1
+popup/item_2/text = "Fuck"
+popup/item_2/id = 2
 
-[node name="Button3" type="Button" parent="PlayerUI/VBoxContainer"]
+[node name="ItemsMenu" type="MenuButton" parent="PlayerUI/VBoxContainer"]
 layout_mode = 2
 text = "Items"
+flat = false
 
-[node name="Button4" type="Button" parent="PlayerUI/VBoxContainer"]
+[node name="GuardButton" type="Button" parent="PlayerUI/VBoxContainer"]
 layout_mode = 2
 text = "Guard"

@@ -29,5 +29,6 @@ namespace Classes.Combatant
     {
         public string Name;
         public Action<ICombatant, ICombatant> Action;
+        public float Cost;
     }
 }

@@ -12,7 +12,7 @@ public partial class Battle : Node3D
 	private List<ICombatant> combatants = new();
 	private ICombatant currentCombatant;
 	private VBoxContainer battleUI;
-	private Sprite3D targeter;
+	private PlayerUI playerUI;
 
 	enum BATTLE_STATE {TURN_IN_PROGRESS, TURN_ENDED, TURN_STARTED}
 	private BATTLE_STATE currentState = BATTLE_STATE.TURN_STARTED;
@@ -20,8 +20,7 @@ public partial class Battle : Node3D
 	public override void _Ready()
     {
         battleUI = GetNode<VBoxContainer>("BattleUI");
-		targeter = GetNode<Sprite3D>("Targeter");
-		targeter.Visible = false;
+		playerUI = GetNode<PlayerUI>("PlayerUI");
 
         var player = new Combatant
         {
@@ -32,7 +31,8 @@ public partial class Battle : Node3D
             Attack = 1.0f,
             PlayerControlled = true,
             Skills = new() {
-                Database.SkillLibrary[SKILLS.STRIKE]
+                Database.SkillLibrary[SKILLS.STRIKE],
+				Database.SkillLibrary[SKILLS.FIREBALL]
             }
         };
 
@@ -109,7 +109,6 @@ public partial class Battle : Node3D
 
 			case BATTLE_STATE.TURN_ENDED:
 				currentCombatant = FindNextCombatant();
-				targeter.Visible = currentCombatant.PlayerControlled;
 				List<ICombatant> enemies = combatants.Where(e => !e.PlayerControlled).ToList();
 				currentState = BATTLE_STATE.TURN_STARTED;
 			break;
